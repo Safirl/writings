@@ -1,4 +1,10 @@
-@import '@fontsource/fira-mono';
+@font-face {
+    font-family: "Junicode";
+    src: url("/fonts/JunicodeVF-Roman.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
 
 :root {
 	--font-body:
