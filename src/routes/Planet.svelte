@@ -11,18 +11,21 @@
 			75,
 			container.clientWidth / container.clientHeight,
 			0.1,
-			1000
+			0.905
 		);
-		camera.position.z = 5;
+		camera.position.z = 1.4;
 		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize(container.clientWidth, container.clientHeight);
 		container.appendChild(renderer.domElement);
 
 		const geometry = new THREE.SphereGeometry(1, 32, 32);
-		const material = new THREE.MeshBasicMaterial({ color: '#3a6ea6', wireframe: true });
+		const material = new THREE.MeshDepthMaterial()
+		// const material = new THREE.MeshBasicMaterial({ color: '#3a6ea6', wireframe: true });
 		material.wireframe = true;
 		const sphere = new THREE.Mesh(geometry, material);
 		scene.add(sphere);
+
+		scene.fog = new THREE.Fog("#3a6ea6", 0.1, 0.905);
 
 		// Sizes
 		const sizes = {
@@ -42,10 +45,11 @@
 			// Update renderer
 			renderer.setSize(sizes.width, sizes.height);
 		});
+	
 
 		function animate() {
 			requestAnimationFrame(animate);
-			sphere.rotation.y += 0.01;
+			// sphere.rotation.y += 0.01;è
 			renderer.render(scene, camera);
 		}
 
@@ -55,7 +59,8 @@
 		const gui = new GUI();
 		const debugObject = {
 			color: '#3a6ea6',
-			cameraFov: 75
+			cameraFov: 75,
+			farClip: 0.905
 		};
 		gui.add(camera.position, 'z', 0, 10, 0.01).name('cameraDistance');
 		gui.addColor(debugObject, 'color').onChange((newColor: string) => {
@@ -63,6 +68,10 @@
 		});
 		gui.add(debugObject, 'cameraFov', 0, 150, 0.01).onChange((newFov: number) => {
 			camera.fov = newFov;
+			camera.updateProjectionMatrix();
+		});
+		gui.add(debugObject, 'farClip', 0, 10, 0.001).onChange((newFarClip: number) => {
+			camera.far = newFarClip;
 			camera.updateProjectionMatrix();
 		});
 	});
