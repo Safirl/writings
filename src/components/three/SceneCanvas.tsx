@@ -6,7 +6,11 @@ import Environment from "./Environment";
 import { GUI } from 'lil-gui'
 import InteractiveCard from "./InteractiveCard";
 
-const SceneCanvas = () => {
+interface CanvasProps {
+  projects: { id: number, title: string }[]
+}
+
+const SceneCanvas = (props: CanvasProps) => {
   const [radius, setRadius] = useState<number>(100);
 
   return (
@@ -14,7 +18,11 @@ const SceneCanvas = () => {
       <Canvas camera={{ position: [0, 0, 200], fov: 75 }}>
         <Environment />
         <Planet onChangeRadius={setRadius} radius={radius} />
-        <InteractiveCard planetRadius={radius} angle={{ theta: 0, phi: Math.PI }} />
+        {props.projects.map((project) => {
+          return (
+            <InteractiveCard planetRadius={radius} angle={{ theta: (Math.random() - 0.5) * 6, phi: (Math.random() - 0.5) }} key={project.id} id={project.id} />
+          )
+        })}
       </Canvas>
     </Suspense>
   );

@@ -5,8 +5,8 @@ import getGUI from "./debugUI";
 
 const Fog = () => {
     const [fogDensity, setFogDensity] = useState({
-        near: 0,
-        far: 500
+        near: 90,
+        far: 180
     })
     useEffect(() => {
         const gui = getGUI();
@@ -20,6 +20,7 @@ const Fog = () => {
             setFogDensity(prev => ({ ...prev, far: newValue }))
         });
 
+        return () => folder.destroy();
     }, [])
 
     const fog = useMemo(() => new THREE.Fog("#0f0f0f", fogDensity.near, fogDensity.far), [fogDensity])
