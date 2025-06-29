@@ -15,12 +15,12 @@ const SceneCanvas = (props: CanvasProps) => {
 
   return (
     <Suspense fallback={null}>
-      <Canvas camera={{ position: [0, 0, 200], fov: 75 }}>
+      <Canvas camera={{ position: [0, 10, 200], fov: 75 }}>
         <Environment />
         <Planet onChangeRadius={setRadius} radius={radius} />
         {props.projects.map((project) => {
           return (
-            <InteractiveCard planetRadius={radius} angle={{ theta: (Math.random() - 0.5) * 6, phi: (Math.random() - 0.5) }} key={project.id} id={project.id} />
+            <InteractiveCard planetRadius={radius} angle={{ theta: (Math.random() - 0.5) * 6, phi: (Math.random()) * Math.PI / 4 }} key={project.id} id={project.id} />
           )
         })}
       </Canvas>

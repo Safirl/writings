@@ -33,7 +33,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
         folder?.add(props.angle, "theta").min(-3.14).max(3.14).onChange((newValue: number) => {
             setAngle(prev => ({ ...prev, theta: newValue }))
         });
-        folder?.add(props.angle, "phi").min(-0.5).max(0.5).onChange((newValue: number) => {
+        folder?.add(props.angle, "phi").min(-Math.PI).max(Math.PI).onChange((newValue: number) => {
             setAngle(prev => ({ ...prev, phi: newValue }))
         });
         folder?.add(radiusDelta, "delta").min(0).max(5).onChange((newValue: number) => {

@@ -22,7 +22,7 @@ const Planet = (props: PlanetProps) => {
         <>
             <mesh ref={meshRef}>
                 <sphereGeometry args={[props.radius, 32, 32]} />
-                <meshStandardMaterial color={"orange"} wireframe />
+                <meshStandardMaterial color={"white"} wireframe />
             </mesh>
         </>
     )

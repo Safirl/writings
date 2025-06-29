@@ -4,9 +4,10 @@ import Fog from "./Fog";
 import { useEffect, useState } from "react";
 import type GUI from "lil-gui";
 import getOrCreateGUI from "./debugUI";
+import WaterPlane from "./Water"
 
 const Environment = () => {
-    const [cameraSettings, setCameraSettings] = useState({ zoomMin: 153, zoomMax: 200, rotateSpeed: .25, zoomSpeed: .1 })
+    const [cameraSettings, setCameraSettings] = useState({ zoomMin: 153, zoomMax: 200, rotateSpeed: .25, zoomSpeed: .1, minPolarAngle: Math.PI / 3, maxPolarAngle: Math.PI / 2 })
 
     useEffect(() => {
         const gui = getOrCreateGUI();
@@ -24,6 +25,9 @@ const Environment = () => {
         folder.add(cameraSettings, "rotateSpeed").min(0).max(1).onChange((newValue: number) => {
             setCameraSettings(prev => ({ ...prev, rotateSpeed: newValue }))
         });
+        folder.add(cameraSettings, "maxPolarAngle").min(-Math.PI).max(Math.PI).onChange((newValue: number) => {
+            setCameraSettings(prev => ({ ...prev, maxPolarAngle: newValue }))
+        });
         folder.add(cameraSettings, "zoomSpeed").min(0).max(1).onChange((newValue: number) => {
             setCameraSettings(prev => ({ ...prev, zoomSpeed: newValue }))
         });
@@ -37,14 +41,15 @@ const Environment = () => {
             <directionalLight position={[5, 5, 5]} intensity={1} />
             <OrbitControls
                 enablePan={false}
-                maxPolarAngle={2 * Math.PI / 3}
-                minPolarAngle={Math.PI / 3}
+                maxPolarAngle={cameraSettings.maxPolarAngle}
+                minPolarAngle={cameraSettings.minPolarAngle}
                 minDistance={cameraSettings.zoomMin}
                 maxDistance={cameraSettings.zoomMax}
                 rotateSpeed={cameraSettings.rotateSpeed}
                 zoomSpeed={cameraSettings.zoomSpeed}
             />
             <Fog />
+            <WaterPlane />
         </>
     )
 }
