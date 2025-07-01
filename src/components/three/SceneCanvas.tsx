@@ -11,7 +11,7 @@ interface CanvasProps {
 }
 
 const SceneCanvas = (props: CanvasProps) => {
-  const [radius, setRadius] = useState<number>(100);
+  const [radius, setRadius] = useState<number>(95);
 
   return (
     <Suspense fallback={null}>
