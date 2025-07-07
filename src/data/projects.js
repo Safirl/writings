@@ -1,15 +1,18 @@
 const projects = [
   {
     id: 0,
-    title: "",
+    title: "test",
+    imgURL: "./projectImages/project1.jpg",
   },
   {
     id: 1,
-    title: "",
+    title: "test",
+    imgURL: "./projectImages/project1.jpg",
   },
   {
     id: 2,
-    title: "",
+    title: "test",
+    imgURL: "./projectImages/project1.jpg",
   },
 ];
 

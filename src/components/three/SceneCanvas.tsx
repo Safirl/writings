@@ -7,7 +7,7 @@ import { GUI } from 'lil-gui'
 import InteractiveCard from "./InteractiveCard";
 
 interface CanvasProps {
-  projects: { id: number, title: string }[]
+  projects: { id: number, title: string, imgURL: string }[]
 }
 
 const SceneCanvas = (props: CanvasProps) => {
@@ -20,7 +20,7 @@ const SceneCanvas = (props: CanvasProps) => {
         <Planet onChangeRadius={setRadius} radius={radius} />
         {props.projects.map((project) => {
           return (
-            <InteractiveCard planetRadius={radius} angle={{ theta: (Math.random() - 0.5) * 6, phi: (Math.random()) * Math.PI / 4 }} key={project.id} id={project.id} />
+            <InteractiveCard text={project.title} imgURL={project.imgURL} planetRadius={radius} angle={{ theta: (Math.random() - 0.5) * 6, phi: (Math.random()) * Math.PI / 4 }} key={project.id} id={project.id} />
           )
         })}
       </Canvas>
