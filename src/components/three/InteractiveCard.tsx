@@ -15,23 +15,22 @@ function createCardtexture(text: string, imgURL: string): Promise<HTMLCanvasElem
     return new Promise((resolve) => {
         const canvas = document.createElement("canvas")
         canvas.width = 512;
-        canvas.height = 256;
+        canvas.height = 384;
         const ctx = canvas.getContext("2d")!;
 
         const image = new Image();
         image.src = imgURL;
 
         image.onload = () => {
-            ctx.fillStyle = "black";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0F0F0F";
 
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-            ctx.fillRect(0, 256 - 32, canvas.width, 32)
+            ctx.fillRect(0, 384 - 64, canvas.width, 64)
 
             ctx.fillStyle = "white";
-            ctx.font = "20px sans-serif"
-            ctx.fillText(text, 16, 240)
+            ctx.font = "32px Junicode"
+            ctx.fillText(text, 16, 384 - 24)
             resolve(canvas);
         }
     })
@@ -113,18 +112,20 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     }
 
     if (!texture) {
-        console.log("not working")
         return null;
     }
     else {
-        console.log("working !")
         return (
-            <>
-                <mesh ref={meshRef}>
-                    <planeGeometry args={[30, 15]} />
-                    <meshStandardMaterial map={texture} side={THREE.DoubleSide} />
+            <group ref={meshRef}>
+                <mesh >
+                    <planeGeometry args={[32, 24]} />
+                    <meshStandardMaterial map={texture} side={THREE.FrontSide} />
                 </mesh>
-            </>
+                <mesh >
+                    <planeGeometry args={[32, 24]} />
+                    <meshStandardMaterial color="#0F0F0F" side={THREE.BackSide} />
+                </mesh>
+            </group>
         )
     }
 
