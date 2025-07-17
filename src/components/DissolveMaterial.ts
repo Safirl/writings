@@ -1,12 +1,18 @@
 import * as THREE from "three";
 import { shaderMaterial } from "@react-three/drei";
-import { extend } from "@react-three/fiber";
+import { extend, type ThreeElement } from "@react-three/fiber";
+
+declare module "@react-three/fiber" {
+    interface ThreeElements {
+        dissolveMaterial: ThreeElement<typeof DissolveMaterial>;
+    }
+}
 
 const vertexShader = `
     varying vec2 vUv;
     void main() {
         vUv = uv;
-        gl_position = projectionMatrix * modelViewMatrix * vec4(position, 1.0)
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
 `;
 
@@ -33,14 +39,14 @@ const fragmentShader = `
 `;
 
 const DissolveMaterial = shaderMaterial(
-  {
-    uTexture: new THREE.Texture(),
-    uNoiseTexture: new THREE.Texture(),
-    uDissolve: 0.0,
-    uEdgeColor: new THREE.Color(0x000000),
-  },
-  vertexShader,
-  fragmentShader
+    {
+        uTexture: new THREE.Texture(),
+        uNoiseTexture: new THREE.Texture(),
+        uDissolve: 0.0,
+        uEdgeColor: new THREE.Color(0x000000),
+    },
+    vertexShader,
+    fragmentShader
 );
 
 extend({ DissolveMaterial });
