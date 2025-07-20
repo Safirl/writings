@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { StrictMode, Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import Loading from "../Loading";
 import Planet from "./Planet";

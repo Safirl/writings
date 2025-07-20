@@ -42,6 +42,7 @@ const WaterPlane = () => {
   }, [normalMap]);
 
   useFrame((_, delta) => {
+    if (!waterRef.current) return;
     waterRef.current.material.uniforms.time.value += delta;
   });
 
