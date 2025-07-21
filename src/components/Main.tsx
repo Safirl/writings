@@ -2,7 +2,6 @@ import "../styles/reset.scss";
 import "../styles/globals.scss";
 import Welcome from "./Welcome";
 import SceneCanvas from "./three/SceneCanvas";
-import projects from "../data/projects";
 import { useState } from "react";
 
 const Main = () => {
@@ -17,7 +16,7 @@ const Main = () => {
       {bDisplayWelcome ? (
         <Welcome onEnterClicked={handleEnterClick} />
       ) : (
-        <SceneCanvas projects={projects} />
+        <SceneCanvas />
       )}
     </>
   );

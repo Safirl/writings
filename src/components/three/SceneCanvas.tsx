@@ -6,29 +6,21 @@ import Environment from "./Environment";
 import { GUI } from "lil-gui";
 import InteractiveCard from "./InteractiveCard";
 import { StatsGl } from "@react-three/drei";
+import projects from "../../data/projects";
 
-interface CanvasProps {
-  projects: {
-    id: number;
-    title: string;
-    imgURL: string;
-    phi: number;
-    theta: number;
-  }[];
-}
-
-const SceneCanvas = (props: CanvasProps) => {
+const SceneCanvas = () => {
   const [radius, setRadius] = useState<number>(95);
 
   return (
     <Suspense fallback={null}>
       <Canvas camera={{ position: [0, 10, 200], fov: 75 }}>
         {/* Debug */}
-        <StatsGl />
+        {/* <StatsGl /> */}
         {/* End of debug */}
         <Environment />
         <Planet onChangeRadius={setRadius} radius={radius} />
-        {props.projects.map((project) => {
+        {projects.map((project) => {
+          console.log("Coucou");
           return (
             <InteractiveCard
               text={project.title}

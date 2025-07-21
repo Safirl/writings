@@ -15,68 +15,135 @@ export interface InteractiveCardProps {
   imgURL: string;
 }
 
+interface TextureLoadingState {
+  texture: THREE.Texture | null;
+  noiseTexture: THREE.Texture | null;
+  isLoading: boolean;
+  hasError: boolean;
+  errorMessage?: string;
+}
+
 function createCardtexture(
   text: string,
   imgURL: string
 ): Promise<HTMLCanvasElement> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const canvas = document.createElement("canvas");
     canvas.width = 512;
     canvas.height = 384;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+
+    if (!ctx) {
+      reject(new Error("Can't create canvas context"));
+      return;
+    }
 
     const image = new Image();
-    image.src = imgURL;
+
+    // Gestion d'erreur de chargement d'image
+    image.onerror = () => {
+      reject(new Error(`Can't load image: ${imgURL}`));
+    };
+
+    // Timeout pour éviter les chargements infinis
+    const timeout = setTimeout(() => {
+      reject(new Error(`Timeout for image: ${imgURL}`));
+    }, 10000);
 
     image.onload = () => {
-      ctx.fillStyle = "#0F0F0F";
+      clearTimeout(timeout);
 
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-      ctx.fillRect(0, 384 - 64, canvas.width, 64);
-
-      ctx.fillStyle = "white";
-      ctx.font = "32px Junicode";
-      ctx.fillText(text, 16, 384 - 24);
-      resolve(canvas);
+      try {
+        ctx.fillStyle = "#0F0F0F";
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 384 - 64, canvas.width, 64);
+        ctx.fillStyle = "white";
+        ctx.font = "32px Junicode";
+        ctx.fillText(text, 16, 384 - 24);
+        resolve(canvas);
+      } catch (error) {
+        reject(new Error(`Error when creating texture: ${error}`));
+      }
     };
+
+    image.src = imgURL;
   });
 }
 
-function getDominantColor(imgUrl: string): Promise<string> {
-  return new Promise((resolve) => {
-    const image = new Image();
-    image.src = imgUrl;
-    image.onload = () => {
-      const colorThief = new ColorThief();
-      const dominantColor = colorThief.getColor(image);
-      const darkenFactor = 0.1;
-      const rgbColor = `rgb(${dominantColor[0] * darkenFactor}, ${
-        dominantColor[1] * darkenFactor
-      }, ${dominantColor[2] * darkenFactor})`;
-      resolve(rgbColor);
-    };
+function loadNoiseTexture(): Promise<THREE.Texture> {
+  return new Promise((resolve, reject) => {
+    const loader = new THREE.TextureLoader();
+
+    const timeout = setTimeout(() => {
+      reject(new Error("Timeout when loading noise texture"));
+    }, 10000);
+
+    loader.load(
+      "./textures/noiseTexture.png",
+      (texture) => {
+        clearTimeout(timeout);
+        resolve(texture);
+      },
+      undefined, // onProgress
+      (error) => {
+        clearTimeout(timeout);
+        reject(new Error(`Can't load noise texture: ${error}`));
+      }
+    );
   });
 }
 
 const InteractiveCard = (props: InteractiveCardProps) => {
   const meshRef = useRef<THREE.Mesh>(null!);
   const materialRef = useRef<THREE.Material>(null!);
+
   const [angle, setAngle] = useState<{ theta: number; phi: number }>({
     theta: 0,
     phi: 0,
   });
+
   const [radiusDelta, setRadiusDelta] = useState<{ delta: number }>({
     delta: 2,
   });
-  const [texture, setTexture] = useState<THREE.Texture | null>();
-  const [noiseTexture, setNoiseTexture] = useState<THREE.Texture | null>();
+
+  const [textureState, setTextureState] = useState<TextureLoadingState>({
+    texture: null,
+    noiseTexture: null,
+    isLoading: true,
+    hasError: false,
+  });
+
   const [edgeColor, setEdgeColor] = useState("");
   const [dissolveStep, setDissolveStep] = useState({ step: 0 });
 
+  const { contextSafe } = useGSAP();
+
+  const onCardHovered = contextSafe(() => {
+    const gsapState = { delta: radiusDelta.delta };
+    gsap.to(gsapState, {
+      delta: 6,
+      duration: 1,
+      ease: "power2.out",
+      onUpdate() {
+        setRadiusDelta({ delta: gsapState.delta });
+      },
+    });
+  });
+
+  const onCardUnhovered = contextSafe(() => {
+    const gsapState = { delta: radiusDelta.delta };
+    gsap.to(gsapState, {
+      delta: 2,
+      duration: 1,
+      ease: "power2.out",
+      onUpdate() {
+        setRadiusDelta({ delta: gsapState.delta });
+      },
+    });
+  });
+
   useGSAP(() => {
-    if (!materialRef.current) return;
+    if (!textureState.texture || !textureState.noiseTexture) return;
 
     const gsapState = { step: 0 };
     gsap.to(gsapState, {
@@ -87,37 +154,77 @@ const InteractiveCard = (props: InteractiveCardProps) => {
         setDissolveStep({ step: gsapState.step });
       },
     });
-  }, [materialRef.current]);
+  }, [textureState.texture, textureState.noiseTexture]);
 
+  // Load textures
   useEffect(() => {
-    createCardtexture(props.text, props.imgURL).then((canvas) => {
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.needsUpdate = true;
-      setTexture(texture);
-    });
+    //avoid memory leaks
+    let isMounted = true;
+
+    setTextureState((prev) => ({ ...prev, isLoading: true, hasError: false }));
+
+    const loadTextures = async () => {
+      try {
+        // Load textures
+        const [canvas, noiseTexture] = await Promise.all([
+          createCardtexture(props.text, props.imgURL),
+          loadNoiseTexture(),
+        ]);
+
+        if (!isMounted) return;
+
+        const canvasTexture = new THREE.CanvasTexture(canvas);
+        canvasTexture.needsUpdate = true;
+
+        setTextureState({
+          texture: canvasTexture,
+          noiseTexture: noiseTexture,
+          isLoading: false,
+          hasError: false,
+        });
+      } catch (error) {
+        console.error("Error when loading textures:", error);
+
+        if (!isMounted) return;
+
+        setTextureState({
+          texture: null,
+          noiseTexture: null,
+          isLoading: false,
+          hasError: true,
+          errorMessage:
+            error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    };
+
+    loadTextures();
+
+    return () => {
+      isMounted = false;
+    };
   }, [props.text, props.imgURL]);
 
   useEffect(() => {
-    const loader = new THREE.TextureLoader();
-    loader.load("./textures/noiseTexture.png", (texture) => {
-      setNoiseTexture(texture);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!meshRef.current) return;
-    setPositionAndRotation(angle.theta, angle.phi);
-  }, [angle, radiusDelta.delta, texture, meshRef.current]);
-
-  useEffect(() => {
-    //Setup GUI
-    if (!meshRef.current) return;
     setAngle(props.angle);
-    const gui = getOrCreateGUI();
-    let folder: GUI;
-    if (!gui || props.id !== 0) return;
+  }, [props.angle]);
 
-    folder = gui.addFolder("InteractiveCard");
+  // Set card transform
+  useEffect(() => {
+    if (textureState.texture && !textureState.hasError) {
+      setPositionAndRotation(angle.theta, angle.phi);
+    }
+  }, [angle, radiusDelta.delta, textureState.texture]);
+
+  // GUI
+  useEffect(() => {
+    if (props.id != 0 || !meshRef.current || !textureState.texture) return;
+
+    console.log("creating gui");
+    const gui = getOrCreateGUI();
+    if (!gui) return;
+
+    const folder = gui.addFolder("InteractiveCard");
 
     folder
       ?.add(props.angle, "theta")
@@ -126,6 +233,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       .onChange((newValue: number) => {
         setAngle((prev) => ({ ...prev, theta: newValue }));
       });
+
     folder
       ?.add(props.angle, "phi")
       .min(-Math.PI)
@@ -133,6 +241,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       .onChange((newValue: number) => {
         setAngle((prev) => ({ ...prev, phi: newValue }));
       });
+
     folder
       ?.add(radiusDelta, "delta")
       .min(0)
@@ -140,6 +249,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       .onChange((newValue: number) => {
         setRadiusDelta({ delta: newValue });
       });
+
     folder
       ?.add(dissolveStep, "step")
       .min(0)
@@ -150,14 +260,18 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       });
 
     return () => folder.destroy();
-  }, [props.planetRadius, props.angle, texture, meshRef.current]);
+  }, [
+    props.planetRadius,
+    props.angle,
+    textureState.texture,
+    // radiusDelta,
+    // dissolveStep,
+  ]);
 
   const setPositionAndRotation = (newTheta: number, newPhi: number) => {
     if (!meshRef.current) return;
 
     const newPosition = calculatePosition(newTheta, newPhi);
-
-    // Mettre à jour la position de la card
     meshRef.current.position.set(newPosition.x, newPosition.y, newPosition.z);
 
     const planetCenter = new THREE.Vector3(0, 0, 0);
@@ -166,15 +280,6 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   };
 
   const calculatePosition = (newTheta: number, newPhi: number) => {
-    //  theta: Angle autour de l'axe Y (angle theta de x vers z)
-    // ---->x
-    // |
-    // v z
-
-    //  phi: Angle autour de l'axe Z (angle phi de x vers y)
-    // ^ y
-    // |
-    // ---->x
     const theta = newTheta;
     const phi = newPhi;
 
@@ -191,29 +296,46 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     };
   };
 
-  if (!texture || !noiseTexture) {
+  // Debug
+  if (textureState.isLoading) {
     return null;
-  } else {
-    return (
-      <group ref={meshRef}>
-        <mesh>
-          <planeGeometry args={[32, 24]} />
-          <dissolveMaterial
-            ref={materialRef}
-            side={THREE.FrontSide}
-            uTexture={texture}
-            uNoiseTexture={noiseTexture}
-            uEdgeColor={edgeColor}
-            uDissolve={dissolveStep.step}
-          />
-        </mesh>
-        <mesh>
-          <planeGeometry args={[32, 24]} />
-          <meshStandardMaterial color="#0F0F0F" side={THREE.BackSide} />
-        </mesh>
-      </group>
-    );
   }
+
+  if (textureState.hasError) {
+    console.error(
+      `InteractiveCard Error: ${props.id}:`,
+      textureState.errorMessage
+    );
+    return null;
+  }
+
+  if (!textureState.texture || !textureState.noiseTexture) {
+    return null;
+  }
+
+  return (
+    <group
+      ref={meshRef}
+      onPointerEnter={onCardHovered}
+      onPointerLeave={onCardUnhovered}
+    >
+      <mesh>
+        <planeGeometry args={[32, 24]} />
+        <dissolveMaterial
+          ref={materialRef}
+          side={THREE.FrontSide}
+          uTexture={textureState.texture}
+          uNoiseTexture={textureState.noiseTexture}
+          uEdgeColor={edgeColor}
+          uDissolve={dissolveStep.step}
+        />
+      </mesh>
+      <mesh>
+        <planeGeometry args={[32, 24]} />
+        <meshStandardMaterial color="#0F0F0F" side={THREE.BackSide} />
+      </mesh>
+    </group>
+  );
 };
 
 export default InteractiveCard;

@@ -1,23 +1,5 @@
 import type { MouseEventHandler } from "react";
 import "../styles/welcome.module.scss";
-// {
-//   /* <style lang="scss">
-//   @use "../styles/variables";
-//   main {
-//   }
-
-//   p {
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     justify-content: center;
-//   }
-
-//   button {
-//     padding-top: variables.$spacing-m;
-//   }
-// </style> */
-//}
 
 interface WelcomeProps {
   onEnterClicked: MouseEventHandler<HTMLButtonElement>;
