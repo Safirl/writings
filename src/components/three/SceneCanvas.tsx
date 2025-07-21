@@ -5,6 +5,7 @@ import Planet from "./Planet";
 import Environment from "./Environment";
 import { GUI } from "lil-gui";
 import InteractiveCard from "./InteractiveCard";
+import { StatsGl } from "@react-three/drei";
 
 interface CanvasProps {
   projects: {
@@ -22,6 +23,9 @@ const SceneCanvas = (props: CanvasProps) => {
   return (
     <Suspense fallback={null}>
       <Canvas camera={{ position: [0, 10, 200], fov: 75 }}>
+        {/* Debug */}
+        <StatsGl />
+        {/* End of debug */}
         <Environment />
         <Planet onChangeRadius={setRadius} radius={radius} />
         {props.projects.map((project) => {
