@@ -14,7 +14,11 @@ import {
 } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
 
-const Environment = () => {
+interface EnvironmentProps {
+  bDisableOrbitControls: boolean;
+}
+
+const Environment = (props: EnvironmentProps) => {
   const [cameraSettings, setCameraSettings] = useState({
     zoomMin: 153,
     zoomMax: 200,
@@ -26,6 +30,8 @@ const Environment = () => {
     focalLength: 0.15,
     focalHeight: 480,
     bokehScale: 2,
+    enableZoom: true,
+    enableRotate: true,
   });
   const [skySettings, setSkySettings] = useState({
     turbidity: 10,
@@ -33,6 +39,15 @@ const Environment = () => {
     mieDirectionalG: 0.95,
     sunPosition: { x: 0.3, y: -0.038, z: -0.95 },
   });
+
+  useEffect(() => {
+    setCameraSettings((prev) => ({
+      ...prev,
+      enableZoom: !props.bDisableOrbitControls,
+      enableRotate: !props.bDisableOrbitControls,
+      zoomMin: props.bDisableOrbitControls ? 0 : 153,
+    }));
+  }, [props.bDisableOrbitControls]);
 
   useEffect(() => {
     const gui = getOrCreateGUI();
@@ -131,7 +146,9 @@ const Environment = () => {
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 5, 5]} intensity={1} />
       <OrbitControls
+        enableRotate={cameraSettings.enableRotate}
         enablePan={false}
+        enableZoom={cameraSettings.enableZoom}
         maxPolarAngle={cameraSettings.maxPolarAngle}
         minPolarAngle={cameraSettings.minPolarAngle}
         minDistance={cameraSettings.zoomMin}

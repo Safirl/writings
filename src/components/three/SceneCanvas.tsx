@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import Loading from "../Loading";
 import Planet from "./Planet";
@@ -9,6 +9,11 @@ import projects from "../../data/projects";
 
 const SceneCanvas = () => {
   const [radius, setRadius] = useState<number>(95);
+  const [bDisableOrbitControls, setDisableOrbitControls] = useState(false);
+
+  function onCardClicked() {
+    setDisableOrbitControls(true);
+  }
 
   return (
     <Suspense fallback={null}>
@@ -16,7 +21,7 @@ const SceneCanvas = () => {
         {/* Debug */}
         {/* <StatsGl /> */}
         {/* End of debug */}
-        <Environment />
+        <Environment bDisableOrbitControls={bDisableOrbitControls} />
         <Planet onChangeRadius={setRadius} radius={radius} />
         {projects.map((project) => {
           return (
@@ -30,6 +35,7 @@ const SceneCanvas = () => {
               }}
               key={project.id}
               id={project.id}
+              onCardClicked={onCardClicked}
             />
           );
         })}

@@ -14,6 +14,7 @@ interface InteractiveCardProps {
   id: number;
   text: string;
   imgURL: string;
+  onCardClicked: () => void;
 }
 
 interface TextureLoadingState {
@@ -147,10 +148,12 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   });
 
   const onCardClicked = contextSafe(() => {
-    if (!meshRef || !camera) return;
+    if (!meshRef.current || !camera) return;
+    //notify the parent that the card has been clicked
+    props.onCardClicked();
+
     const forward = new THREE.Vector3();
     meshRef.current.getWorldDirection(forward);
-    const startPosition = camera.position.clone();
     let targetPosition = new THREE.Vector3();
     targetPosition = meshRef.current.position
       .clone()
@@ -162,9 +165,32 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       z: targetPosition.z,
       duration: 3,
       ease: "sine.inOut",
+      onComplete: () => {
+        zoomAnimation();
+      },
     });
   });
 
+  const zoomAnimation = contextSafe(() => {
+    if (!meshRef.current || !camera) return;
+
+    const forward = new THREE.Vector3();
+    meshRef.current.getWorldDirection(forward);
+    let targetPosition = new THREE.Vector3();
+    targetPosition = meshRef.current.position
+      .clone()
+      .add(forward.multiplyScalar(30));
+
+    gsap.to(camera.position, {
+      x: targetPosition.x,
+      y: targetPosition.y,
+      z: targetPosition.z,
+      duration: 3,
+      ease: "sine.inOut",
+    });
+  });
+
+  //Dissolve animation
   useGSAP(() => {
     if (!textureState.texture || !textureState.noiseTexture) return;
 
@@ -172,7 +198,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     gsap.to(gsapState, {
       step: 1,
       duration: 2,
-      ease: "power2.inOut",
+      ease: "power2.out",
       onUpdate() {
         setDissolveStep({ step: gsapState.step });
       },
@@ -228,6 +254,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     };
   }, [props.text, props.imgURL]);
 
+  //Set angle
   useEffect(() => {
     setAngle(props.angle);
   }, [props.angle]);
