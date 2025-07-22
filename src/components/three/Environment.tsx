@@ -1,6 +1,6 @@
-import { OrbitControls } from "@react-three/drei";
+import { Circle, OrbitControls } from "@react-three/drei";
 import Fog from "./Fog";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type GUI from "lil-gui";
 import getOrCreateGUI from "./debugUI";
 import WaterPlane from "./Water";
@@ -26,7 +26,7 @@ const Environment = (props: EnvironmentProps) => {
     zoomSpeed: 0.1,
     minPolarAngle: Math.PI / 3,
     maxPolarAngle: Math.PI / 2,
-    focusDistance: 0.1,
+    focusDistance: 0.08,
     focalLength: 0.15,
     focalHeight: 480,
     bokehScale: 2,
@@ -143,8 +143,9 @@ const Environment = (props: EnvironmentProps) => {
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 5, 5]} intensity={1} />
+      {/* <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 5, 5]} intensity={0} /> */}
+      <pointLight position={[10, 50, 100]} intensity={1000} />
       <OrbitControls
         enableRotate={cameraSettings.enableRotate}
         enablePan={false}
@@ -156,9 +157,9 @@ const Environment = (props: EnvironmentProps) => {
         rotateSpeed={cameraSettings.rotateSpeed}
         zoomSpeed={cameraSettings.zoomSpeed}
       />
-      <Fog />
+      {/* <Fog /> */}
       <WaterPlane />
-      <Sky
+      {/* <Sky
         turbidity={skySettings.turbidity}
         mieCoefficient={skySettings.mieCoefficient}
         mieDirectionalG={skySettings.mieDirectionalG}
@@ -167,7 +168,7 @@ const Environment = (props: EnvironmentProps) => {
           skySettings.sunPosition.y,
           skySettings.sunPosition.z,
         ]}
-      />
+      /> */}
       <EffectComposer>
         <DepthOfField
           focusDistance={cameraSettings.focusDistance}
@@ -175,7 +176,6 @@ const Environment = (props: EnvironmentProps) => {
           bokehScale={cameraSettings.bokehScale}
           height={480}
         />
-        {/* <ChromaticAberration /> */}
         <Vignette
           offset={0.5} // vignette offset
           darkness={0.5} // vignette darkness

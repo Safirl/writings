@@ -99,6 +99,8 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   const meshRef = useRef<THREE.Mesh>(null!);
   const materialRef = useRef<THREE.Material>(null!);
   const timeoutRef = useRef<number | null>(null);
+  let [bIsPointerMoving, setIsPointerMoving] = useState(false);
+  let [bHasBeenClicked, setHasBeenClicked] = useState(false);
   const { camera } = useThree();
 
   const [angle, setAngle] = useState<{ theta: number; phi: number }>({
@@ -119,11 +121,11 @@ const InteractiveCard = (props: InteractiveCardProps) => {
 
   const [edgeColor, setEdgeColor] = useState("");
   const [dissolveStep, setDissolveStep] = useState({ step: 0 });
-  let bIsPointerMoving = false;
 
   const { contextSafe } = useGSAP();
 
   const onCardHovered = contextSafe(() => {
+    if (bHasBeenClicked) return;
     document.body.style.cursor = "pointer";
     const gsapState = { delta: radiusDelta.delta };
     gsap.to(gsapState, {
@@ -150,9 +152,11 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   });
 
   const onCardClicked = contextSafe(() => {
-    if (!meshRef.current || !camera || bIsPointerMoving) return;
+    if (!meshRef.current || !camera || bIsPointerMoving || bHasBeenClicked)
+      return;
     //notify the parent that the card has been clicked
     props.onCardClicked();
+    setHasBeenClicked(true);
 
     const forward = new THREE.Vector3();
     meshRef.current.getWorldDirection(forward);
@@ -177,9 +181,9 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    bIsPointerMoving = true;
+    setIsPointerMoving(true);
     timeoutRef.current = window.setTimeout(() => {
-      bIsPointerMoving = false;
+      setIsPointerMoving(false);
     }, 300);
   };
 
@@ -236,6 +240,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
 
         const canvasTexture = new THREE.CanvasTexture(canvas);
         canvasTexture.needsUpdate = true;
+        canvasTexture.colorSpace = THREE.SRGBColorSpace;
 
         setTextureState({
           texture: canvasTexture,
@@ -282,7 +287,6 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   useEffect(() => {
     if (props.id != 0 || !meshRef.current || !textureState.texture) return;
 
-    console.log("creating gui");
     const gui = getOrCreateGUI();
     if (!gui) return;
 
