@@ -98,6 +98,7 @@ function loadNoiseTexture(): Promise<THREE.Texture> {
 const InteractiveCard = (props: InteractiveCardProps) => {
   const meshRef = useRef<THREE.Mesh>(null!);
   const materialRef = useRef<THREE.Material>(null!);
+  const timeoutRef = useRef<number | null>(null);
   const { camera } = useThree();
 
   const [angle, setAngle] = useState<{ theta: number; phi: number }>({
@@ -118,6 +119,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
 
   const [edgeColor, setEdgeColor] = useState("");
   const [dissolveStep, setDissolveStep] = useState({ step: 0 });
+  let bIsPointerMoving = false;
 
   const { contextSafe } = useGSAP();
 
@@ -148,7 +150,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   });
 
   const onCardClicked = contextSafe(() => {
-    if (!meshRef.current || !camera) return;
+    if (!meshRef.current || !camera || bIsPointerMoving) return;
     //notify the parent that the card has been clicked
     props.onCardClicked();
 
@@ -170,6 +172,16 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       },
     });
   });
+
+  const handlePointerMove = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    bIsPointerMoving = true;
+    timeoutRef.current = window.setTimeout(() => {
+      bIsPointerMoving = false;
+    }, 300);
+  };
 
   const zoomAnimation = contextSafe(() => {
     if (!meshRef.current || !camera) return;
@@ -369,6 +381,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       onPointerEnter={onCardHovered}
       onPointerLeave={onCardUnhovered}
       onClick={onCardClicked}
+      onPointerMove={handlePointerMove}
     >
       <mesh>
         <planeGeometry args={[32, 24]} />

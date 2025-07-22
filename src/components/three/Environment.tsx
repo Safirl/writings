@@ -156,6 +156,18 @@ const Environment = (props: EnvironmentProps) => {
         rotateSpeed={cameraSettings.rotateSpeed}
         zoomSpeed={cameraSettings.zoomSpeed}
       />
+      <Fog />
+      <WaterPlane />
+      <Sky
+        turbidity={skySettings.turbidity}
+        mieCoefficient={skySettings.mieCoefficient}
+        mieDirectionalG={skySettings.mieDirectionalG}
+        sunPosition={[
+          skySettings.sunPosition.x,
+          skySettings.sunPosition.y,
+          skySettings.sunPosition.z,
+        ]}
+      />
       <EffectComposer>
         <DepthOfField
           focusDistance={cameraSettings.focusDistance}
@@ -171,18 +183,6 @@ const Environment = (props: EnvironmentProps) => {
           blendFunction={BlendFunction.NORMAL} // blend mode
         />
       </EffectComposer>
-      <Fog />
-      <WaterPlane />
-      {/* <Sky
-        turbidity={skySettings.turbidity}
-        mieCoefficient={skySettings.mieCoefficient}
-        mieDirectionalG={skySettings.mieDirectionalG}
-        sunPosition={[
-          skySettings.sunPosition.x,4.5
-          skySettings.sunPosition.y,
-          skySettings.sunPosition.z,
-        ]}
-      /> */}
     </>
   );
 };
