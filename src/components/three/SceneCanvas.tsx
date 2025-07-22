@@ -1,9 +1,8 @@
-import { StrictMode, Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import Loading from "../Loading";
 import Planet from "./Planet";
 import Environment from "./Environment";
-import { GUI } from "lil-gui";
 import InteractiveCard from "./InteractiveCard";
 import { StatsGl } from "@react-three/drei";
 import projects from "../../data/projects";
@@ -20,7 +19,6 @@ const SceneCanvas = () => {
         <Environment />
         <Planet onChangeRadius={setRadius} radius={radius} />
         {projects.map((project) => {
-          console.log("Coucou");
           return (
             <InteractiveCard
               text={project.title}

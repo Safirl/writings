@@ -1,7 +1,8 @@
 Notes des choses restantes à faire :
 []- Particules
 []- Placer correctement les images
-[]- animation de hover
+[X]- animation de hover
 []- transitions entre la page d'accueil et le projet
 []- pages projets
 [X]- shader interactiveCard
+[]- click card animation

@@ -7,7 +7,6 @@ import { useState } from "react";
 const Main = () => {
   const [bDisplayWelcome, setDisplayWelcome] = useState(true);
   function handleEnterClick() {
-    console.log("coucou");
     setDisplayWelcome(false);
   }
 

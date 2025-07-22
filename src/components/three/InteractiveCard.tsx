@@ -6,8 +6,9 @@ import ColorThief from "colorthief";
 import DissolveMaterial from "../DissolveMaterial";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useThree, type Camera, type ThreeEvent } from "@react-three/fiber";
 
-export interface InteractiveCardProps {
+interface InteractiveCardProps {
   planetRadius: number;
   angle: { theta: number; phi: number };
   id: number;
@@ -96,6 +97,7 @@ function loadNoiseTexture(): Promise<THREE.Texture> {
 const InteractiveCard = (props: InteractiveCardProps) => {
   const meshRef = useRef<THREE.Mesh>(null!);
   const materialRef = useRef<THREE.Material>(null!);
+  const { camera } = useThree();
 
   const [angle, setAngle] = useState<{ theta: number; phi: number }>({
     theta: 0,
@@ -119,6 +121,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   const { contextSafe } = useGSAP();
 
   const onCardHovered = contextSafe(() => {
+    document.body.style.cursor = "pointer";
     const gsapState = { delta: radiusDelta.delta };
     gsap.to(gsapState, {
       delta: 6,
@@ -131,6 +134,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
   });
 
   const onCardUnhovered = contextSafe(() => {
+    document.body.style.cursor = "auto";
     const gsapState = { delta: radiusDelta.delta };
     gsap.to(gsapState, {
       delta: 2,
@@ -139,6 +143,25 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       onUpdate() {
         setRadiusDelta({ delta: gsapState.delta });
       },
+    });
+  });
+
+  const onCardClicked = contextSafe(() => {
+    if (!meshRef || !camera) return;
+    const forward = new THREE.Vector3();
+    meshRef.current.getWorldDirection(forward);
+    const startPosition = camera.position.clone();
+    let targetPosition = new THREE.Vector3();
+    targetPosition = meshRef.current.position
+      .clone()
+      .add(forward.multiplyScalar(50));
+
+    gsap.to(camera.position, {
+      x: targetPosition.x,
+      y: targetPosition.y,
+      z: targetPosition.z,
+      duration: 3,
+      ease: "sine.inOut",
     });
   });
 
@@ -318,6 +341,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
       ref={meshRef}
       onPointerEnter={onCardHovered}
       onPointerLeave={onCardUnhovered}
+      onClick={onCardClicked}
     >
       <mesh>
         <planeGeometry args={[32, 24]} />

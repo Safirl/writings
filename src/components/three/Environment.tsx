@@ -5,6 +5,14 @@ import type GUI from "lil-gui";
 import getOrCreateGUI from "./debugUI";
 import WaterPlane from "./Water";
 import { Sky } from "@react-three/drei";
+import {
+  DepthOfField,
+  EffectComposer,
+  ChromaticAberration,
+  Vignette,
+  TiltShift,
+} from "@react-three/postprocessing";
+import { BlendFunction } from "postprocessing";
 
 const Environment = () => {
   const [cameraSettings, setCameraSettings] = useState({
@@ -14,6 +22,10 @@ const Environment = () => {
     zoomSpeed: 0.1,
     minPolarAngle: Math.PI / 3,
     maxPolarAngle: Math.PI / 2,
+    focusDistance: 0.1,
+    focalLength: 0.15,
+    focalHeight: 480,
+    bokehScale: 2,
   });
   const [skySettings, setSkySettings] = useState({
     turbidity: 10,
@@ -28,7 +40,7 @@ const Environment = () => {
     if (!gui) return;
 
     folder = gui.addFolder("Camera");
-    folder.open(false);
+    folder.open(true);
 
     folder
       .add(cameraSettings, "zoomMin")
@@ -65,9 +77,33 @@ const Environment = () => {
       .onChange((newValue: number) => {
         setCameraSettings((prev) => ({ ...prev, zoomSpeed: newValue }));
       });
-
-    folder = gui.addFolder("Sky");
     folder
+      .add(cameraSettings, "focusDistance")
+      .min(0)
+      .max(1)
+      .step(0.01)
+      .onChange((newValue: number) => {
+        setCameraSettings((prev) => ({ ...prev, focusDistance: newValue }));
+      });
+    folder
+      .add(cameraSettings, "focalLength")
+      .min(0)
+      .max(1)
+      .step(0.01)
+      .onChange((newValue: number) => {
+        setCameraSettings((prev) => ({ ...prev, focalLength: newValue }));
+      });
+    folder
+      .add(cameraSettings, "bokehScale")
+      .min(0)
+      .max(10)
+      .step(0.01)
+      .onChange((newValue: number) => {
+        setCameraSettings((prev) => ({ ...prev, bokehScale: newValue }));
+      });
+
+    const skyFolder = gui.addFolder("Sky");
+    skyFolder
       .add(skySettings, "turbidity")
       .min(0)
       .max(100)
@@ -75,7 +111,7 @@ const Environment = () => {
       .onChange((newValue: number) => {
         setSkySettings((prev) => ({ ...prev, turbidity: newValue }));
       });
-    folder
+    skyFolder
       .add(skySettings, "mieCoefficient")
       .min(0)
       .max(1)
@@ -84,7 +120,10 @@ const Environment = () => {
         setSkySettings((prev) => ({ ...prev, mieCoefficient: newValue }));
       });
 
-    return () => folder.destroy();
+    return () => {
+      folder.destroy();
+      skyFolder.destroy();
+    };
   }, []);
 
   return (
@@ -100,6 +139,21 @@ const Environment = () => {
         rotateSpeed={cameraSettings.rotateSpeed}
         zoomSpeed={cameraSettings.zoomSpeed}
       />
+      <EffectComposer>
+        <DepthOfField
+          focusDistance={cameraSettings.focusDistance}
+          focalLength={cameraSettings.focalLength}
+          bokehScale={cameraSettings.bokehScale}
+          height={480}
+        />
+        {/* <ChromaticAberration /> */}
+        <Vignette
+          offset={0.5} // vignette offset
+          darkness={0.5} // vignette darkness
+          eskil={false} // Eskil's vignette technique
+          blendFunction={BlendFunction.NORMAL} // blend mode
+        />
+      </EffectComposer>
       <Fog />
       <WaterPlane />
       {/* <Sky
@@ -107,7 +161,7 @@ const Environment = () => {
         mieCoefficient={skySettings.mieCoefficient}
         mieDirectionalG={skySettings.mieDirectionalG}
         sunPosition={[
-          skySettings.sunPosition.x,
+          skySettings.sunPosition.x,4.5
           skySettings.sunPosition.y,
           skySettings.sunPosition.z,
         ]}
