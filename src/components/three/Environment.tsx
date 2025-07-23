@@ -13,6 +13,8 @@ import {
   TiltShift,
 } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 interface EnvironmentProps {
   bDisableOrbitControls: boolean;
@@ -32,6 +34,7 @@ const Environment = (props: EnvironmentProps) => {
     bokehScale: 2,
     enableZoom: true,
     enableRotate: true,
+    vignetteDarkness: 0.5,
   });
   const [skySettings, setSkySettings] = useState({
     turbidity: 10,
@@ -49,6 +52,34 @@ const Environment = (props: EnvironmentProps) => {
     }));
   }, [props.bDisableOrbitControls]);
 
+  useGSAP(() => {
+    const gsapState = { darkness: cameraSettings.vignetteDarkness };
+    setTimeout(() => {
+      gsap.to(gsapState, {
+        darkness: props.bDisableOrbitControls ? 10 : 0.5,
+        duration: 8,
+        ease: "power2.in",
+        onUpdate() {
+          setCameraSettings((prev) => ({
+            ...prev,
+            vignetteDarkness: gsapState.darkness,
+          }));
+        },
+      });
+    }, 500);
+    setTimeout(() => {
+      const transitionObject = document.getElementById("transitionObject");
+      if (!transitionObject) return;
+      gsap.to(transitionObject.style, {
+        opacity: props.bDisableOrbitControls ? 1 : 0,
+        duration: 2,
+        ease: "power2.inOut",
+      });
+      transitionObject.style.opacity;
+    }, 4500);
+  }, [props.bDisableOrbitControls]);
+
+  //gui
   useEffect(() => {
     const gui = getOrCreateGUI();
     let folder: GUI;
@@ -116,6 +147,14 @@ const Environment = (props: EnvironmentProps) => {
       .onChange((newValue: number) => {
         setCameraSettings((prev) => ({ ...prev, bokehScale: newValue }));
       });
+    folder
+      .add(cameraSettings, "bokehScale")
+      .min(0)
+      .max(10)
+      .step(0.01)
+      .onChange((newValue: number) => {
+        setCameraSettings((prev) => ({ ...prev, bokehScale: newValue }));
+      });
 
     const skyFolder = gui.addFolder("Sky");
     skyFolder
@@ -145,7 +184,7 @@ const Environment = (props: EnvironmentProps) => {
     <>
       {/* <ambientLight intensity={0.5} />
       <directionalLight position={[5, 5, 5]} intensity={0} /> */}
-      <pointLight position={[10, 50, 100]} intensity={1000} />
+      <pointLight position={[10, 50, 100]} intensity={10000} />
       <OrbitControls
         enableRotate={cameraSettings.enableRotate}
         enablePan={false}
@@ -177,10 +216,10 @@ const Environment = (props: EnvironmentProps) => {
           height={480}
         />
         <Vignette
-          offset={0.5} // vignette offset
-          darkness={0.5} // vignette darkness
-          eskil={false} // Eskil's vignette technique
-          blendFunction={BlendFunction.NORMAL} // blend mode
+          offset={0.5}
+          darkness={cameraSettings.vignetteDarkness}
+          eskil={false}
+          blendFunction={BlendFunction.NORMAL}
         />
       </EffectComposer>
     </>

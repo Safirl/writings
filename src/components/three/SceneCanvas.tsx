@@ -40,6 +40,17 @@ const SceneCanvas = () => {
           );
         })}
       </Canvas>
+      <div
+        id="transitionObject"
+        style={{
+          position: "absolute",
+          height: "100%",
+          width: "100%",
+          backgroundColor: "black",
+          pointerEvents: "none",
+          opacity: "0",
+        }}
+      ></div>
     </Suspense>
   );
 };
