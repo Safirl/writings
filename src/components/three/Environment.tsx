@@ -15,12 +15,18 @@ import {
 import { BlendFunction } from "postprocessing";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import LiquidMaterial from "../LiquidMaterial";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 
 interface EnvironmentProps {
   bDisableOrbitControls: boolean;
 }
 
 const Environment = (props: EnvironmentProps) => {
+  const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
+
   const [cameraSettings, setCameraSettings] = useState({
     zoomMin: 153,
     zoomMax: 200,
@@ -78,6 +84,12 @@ const Environment = (props: EnvironmentProps) => {
       transitionObject.style.opacity;
     }, 4500);
   }, [props.bDisableOrbitControls]);
+
+  useFrame((state) => {
+    if (!liquidMaterialRef) return;
+    liquidMaterialRef.current.uniforms.time.value =
+      state.clock.getElapsedTime();
+  });
 
   //gui
   useEffect(() => {
@@ -182,8 +194,8 @@ const Environment = (props: EnvironmentProps) => {
 
   return (
     <>
-      {/* <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 5, 5]} intensity={0} /> */}
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 5, 5]} intensity={0} />
       <pointLight position={[10, 50, 100]} intensity={10000} />
       <OrbitControls
         enableRotate={cameraSettings.enableRotate}
@@ -208,6 +220,14 @@ const Environment = (props: EnvironmentProps) => {
           skySettings.sunPosition.z,
         ]}
       /> */}
+      <mesh position={[0, 20, 0]} rotation={[degToRad(70), degToRad(20), 0]}>
+        <sphereGeometry attach="geometry" args={[600, 600]} rotateZ={90} />
+        <liquidMaterial
+          ref={liquidMaterialRef}
+          attach={"material"}
+          side={THREE.BackSide}
+        />
+      </mesh>
       <EffectComposer>
         <DepthOfField
           focusDistance={cameraSettings.focusDistance}
