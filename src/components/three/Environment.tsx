@@ -34,10 +34,6 @@ const Environment = (props: EnvironmentProps) => {
     zoomSpeed: 0.1,
     minPolarAngle: Math.PI / 3,
     maxPolarAngle: Math.PI / 2,
-    focusDistance: 0.08,
-    focalLength: 0.15,
-    focalHeight: 480,
-    bokehScale: 2,
     enableZoom: true,
     enableRotate: true,
     vignetteDarkness: 0.5,
@@ -135,38 +131,6 @@ const Environment = (props: EnvironmentProps) => {
       .onChange((newValue: number) => {
         setCameraSettings((prev) => ({ ...prev, zoomSpeed: newValue }));
       });
-    folder
-      .add(cameraSettings, "focusDistance")
-      .min(0)
-      .max(1)
-      .step(0.01)
-      .onChange((newValue: number) => {
-        setCameraSettings((prev) => ({ ...prev, focusDistance: newValue }));
-      });
-    folder
-      .add(cameraSettings, "focalLength")
-      .min(0)
-      .max(1)
-      .step(0.01)
-      .onChange((newValue: number) => {
-        setCameraSettings((prev) => ({ ...prev, focalLength: newValue }));
-      });
-    folder
-      .add(cameraSettings, "bokehScale")
-      .min(0)
-      .max(10)
-      .step(0.01)
-      .onChange((newValue: number) => {
-        setCameraSettings((prev) => ({ ...prev, bokehScale: newValue }));
-      });
-    folder
-      .add(cameraSettings, "bokehScale")
-      .min(0)
-      .max(10)
-      .step(0.01)
-      .onChange((newValue: number) => {
-        setCameraSettings((prev) => ({ ...prev, bokehScale: newValue }));
-      });
 
     const skyFolder = gui.addFolder("Sky");
     skyFolder
@@ -229,12 +193,6 @@ const Environment = (props: EnvironmentProps) => {
         />
       </mesh>
       <EffectComposer>
-        <DepthOfField
-          focusDistance={cameraSettings.focusDistance}
-          focalLength={cameraSettings.focalLength}
-          bokehScale={cameraSettings.bokehScale}
-          height={480}
-        />
         <Vignette
           offset={0.5}
           darkness={cameraSettings.vignetteDarkness}

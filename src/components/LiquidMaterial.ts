@@ -22,23 +22,37 @@ const fragmentShader = `
     uniform vec3 uCol;
     uniform float time;
 
+  vec3 palette( in float t)
+  {
+      // Palette : [[0.800, 0.063, 0.227] [0.639, 0.122, 0.318] [0.235, 0.020, 0.255] [0.145, 0.024, 0.251] [0.000, 0.067, 0.106]]
+      vec3 a = vec3(0.800, 0.063, 0.227);
+      vec3 b = vec3(0.639, 0.122, 0.318);
+      vec3 c = vec3(0.235, 0.020, 0.255);
+      vec3 d = vec3(0.145, 0.024, 0.251);
+      vec3 e = vec3(0.000, 0.067, 0.106);
+
+      return a + b*cos( 6.28318*(c*t+e) );
+  }
+
     void main() {
         vec3 n = normalize(vNormal);
         vec2 locUv = vec2(
             atan(n.z, n.x) / 3.14159,
             acos(n.y) / 3.14159
         );
+        vec3 col = vec3(0.0);
+        float locTime = time;
 
-        locUv *= 6.5;
+        locUv *= 50.;
     
         float len;
-        for(int i = 0; i < 3; i++) {
+        for(float i = 0.; i < 3.; i++) {
             len = length(locUv);
-            locUv.x +=  sin(locUv.y + time * 0.3)*5.;
-            locUv.y +=  cos(locUv.x + time * 0.1 + cos(len * 2.0))*2.;
+            locUv.x +=  sin(locUv.y + locTime * 0.3)*5.;
+            locUv.y +=  cos(locUv.x + locTime * 0.1 + cos(len * 2.0))*2.;
+            col = palette(length(locUv) + i*.4 + locTime * .2);
         }
         
-        vec3 col = vec3(cos(len + 0.3), cos(len + 0.1), cos(len - 0.1));
         
         gl_FragColor = vec4(col,1.0);
     }
