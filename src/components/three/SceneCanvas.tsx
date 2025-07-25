@@ -22,7 +22,6 @@ const SceneCanvas = () => {
         <StatsGl />
         {/* End of debug */}
         <Environment bDisableOrbitControls={bDisableOrbitControls} />
-        <Planet onChangeRadius={setRadius} radius={radius} />
         {projects.map((project) => {
           return (
             <InteractiveCard
@@ -39,6 +38,7 @@ const SceneCanvas = () => {
             />
           );
         })}
+        <Planet onChangeRadius={setRadius} radius={radius} />
       </Canvas>
       <div
         id="transitionObject"
