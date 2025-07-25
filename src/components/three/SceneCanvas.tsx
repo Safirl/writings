@@ -19,7 +19,7 @@ const SceneCanvas = () => {
     <Suspense fallback={null}>
       <Canvas camera={{ position: [0, 10, 200], fov: 75 }}>
         {/* Debug */}
-        {/* <StatsGl /> */}
+        <StatsGl />
         {/* End of debug */}
         <Environment bDisableOrbitControls={bDisableOrbitControls} />
         <Planet onChangeRadius={setRadius} radius={radius} />

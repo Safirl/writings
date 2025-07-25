@@ -9,21 +9,26 @@ declare module "@react-three/fiber" {
 }
 
 const vertexShader = `
-    varying vec2 vUv;
+    varying vec3 vNormal;
     void main() {
-        vUv = uv;
+        vNormal = normalMatrix * normal;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
 `;
 
 const fragmentShader = `
+    varying vec3 vNormal;
     uniform sampler2D uTexture;
     uniform vec3 uCol;
-    varying vec2 vUv;
     uniform float time;
 
     void main() {
-        vec2 locUv = vUv;
+        vec3 n = normalize(vNormal);
+        vec2 locUv = vec2(
+            atan(n.z, n.x) / 3.14159,
+            acos(n.y) / 3.14159
+        );
+
         locUv *= 6.5;
     
         float len;

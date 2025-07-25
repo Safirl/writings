@@ -17,7 +17,7 @@ const WaterPlane = () => {
     normalMap.wrapS = THREE.RepeatWrapping;
     normalMap.wrapT = THREE.RepeatWrapping;
 
-    const planeGeometry = new THREE.PlaneGeometry(500, 500);
+    const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
 
     const water = new Water(planeGeometry, {
       textureHeight: 512,

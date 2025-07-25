@@ -86,7 +86,7 @@ const Environment = (props: EnvironmentProps) => {
   }, [props.bDisableOrbitControls]);
 
   useFrame((state) => {
-    if (!liquidMaterialRef) return;
+    if (!liquidMaterialRef.current) return;
     liquidMaterialRef.current.uniforms.time.value =
       state.clock.getElapsedTime();
   });
