@@ -5,122 +5,129 @@ import * as THREE from "three";
 import { CubeCamera } from "@react-three/drei";
 
 interface PlanetProps {
-    onChangeRadius: (radius: number) => void;
-    radius: number;
+  onChangeRadius: (radius: number) => void;
+  radius: number;
 }
 
 const Planet = (props: PlanetProps) => {
-    const head = useGLTF("./3D/head.glb");
-    const materialRef = useRef<THREE.MeshStandardMaterial>(new THREE.MeshStandardMaterial({ color: "white", metalness: 1, roughness: .1 }))
-    const [headDebug, setHeadDebug] = useState({
-        position: { x: 28, y: -30, z: 0 },
-        scale: 700,
-        rotation: { rotX: 5.5, rotY: 0, rotZ: Math.PI / 3 },
+  const head = useGLTF("./3D/head.glb");
+  const materialRef = useRef<THREE.MeshStandardMaterial>(
+    new THREE.MeshStandardMaterial({
+      color: "white",
+      metalness: 1,
+      roughness: 0.1,
+    })
+  );
+  const [headDebug, setHeadDebug] = useState({
+    // position: { x: 28, y: -30, z: 0 },
+    // scale: 700,
+    // rotation: { rotX: 5.5, rotY: 0, rotZ: Math.PI / 3 },
+    position: { x: 0, y: 13.2, z: 0 },
+    scale: 4.5,
+    rotation: { rotX: 0, rotY: 0, rotZ: 0 },
+  });
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    loader.load("./textures/mat.png", (texture) => {
+      setTexture(texture);
     });
-    const [texture, setTexture] = useState<THREE.Texture | null>(
-        null
-    );
+  }, []);
 
-    useEffect(() => {
-        const loader = new THREE.TextureLoader();
-        loader.load("./textures/mat.png", (texture) => {
-            setTexture(texture);
-        });
-    }, []);
+  useEffect(() => {
+    if (!head.scene || !texture) return;
 
-    useEffect(() => {
-        if (!head.scene || !texture) return;
+    // const matcapMaterial = new THREE.MeshMatcapMaterial({
+    //     matcap: matcapTexture,
+    // });
 
-        // const matcapMaterial = new THREE.MeshMatcapMaterial({
-        //     matcap: matcapTexture,
-        // });
+    // const material = new THREE.MeshStandardMaterial({ color: "white", metalness: 1, roughness: .1 });
+    // materialRef.current = material;
 
-        // const material = new THREE.MeshStandardMaterial({ color: "white", metalness: 1, roughness: .1 });
-        // materialRef.current = material;
+    head.scene.traverse((child: any) => {
+      if (child.isMesh) {
+        child.material = materialRef.current;
+        child.material.needsUpdate = true;
+      }
+    });
+  }, [head.scene, texture]);
 
-        head.scene.traverse((child: any) => {
-            if (child.isMesh) {
-                child.material = materialRef.current;
-                child.material.needsUpdate = true;
-            }
-        });
-    }, [head.scene, texture]);
+  useEffect(() => {
+    const gui = getGUI();
+    if (!gui) return;
 
-    useEffect(() => {
-        const gui = getGUI();
-        if (!gui) return;
+    const folder = gui.addFolder("Head");
+    folder
+      ?.add(headDebug.position, "y")
+      .min(-200)
+      .max(200)
+      .onChange((newValue: []) => {
+        setHeadDebug((prev) => ({ ...prev, x: newValue }));
+      });
+    folder
+      ?.add(headDebug.position, "x")
+      .min(-200)
+      .max(200)
+      .onChange((newValue: []) => {
+        setHeadDebug((prev) => ({ ...prev, x: newValue }));
+      });
+    folder
+      ?.add(headDebug, "scale")
+      .min(0)
+      .max(800)
+      .onChange((newValue: number) => {
+        setHeadDebug((prev) => ({ ...prev, scale: newValue }));
+      });
+    folder
+      ?.add(headDebug.rotation, "rotZ")
+      .min(0)
+      .max(2 * Math.PI)
+      .onChange((newValue: number) => {
+        setHeadDebug((prev) => ({ ...prev, rotZ: newValue }));
+      });
+    folder
+      ?.add(headDebug.rotation, "rotX")
+      .min(0)
+      .max(2 * Math.PI)
+      .onChange((newValue: number) => {
+        setHeadDebug((prev) => ({ ...prev, rotX: newValue }));
+      });
 
-        const folder = gui.addFolder("Head");
-        folder
-            ?.add(headDebug.position, "y")
-            .min(-200)
-            .max(200)
-            .onChange((newValue: []) => {
-                setHeadDebug((prev) => ({ ...prev, x: newValue }));
-            });
-        folder
-            ?.add(headDebug.position, "x")
-            .min(-200)
-            .max(200)
-            .onChange((newValue: []) => {
-                setHeadDebug((prev) => ({ ...prev, x: newValue }));
-            });
-        folder
-            ?.add(headDebug, "scale")
-            .min(0)
-            .max(800)
-            .onChange((newValue: number) => {
-                setHeadDebug((prev) => ({ ...prev, scale: newValue }));
-            });
-        folder
-            ?.add(headDebug.rotation, "rotZ")
-            .min(0)
-            .max(2 * Math.PI)
-            .onChange((newValue: number) => {
-                setHeadDebug((prev) => ({ ...prev, rotZ: newValue }));
-            });
-        folder
-            ?.add(headDebug.rotation, "rotX")
-            .min(0)
-            .max(2 * Math.PI)
-            .onChange((newValue: number) => {
-                setHeadDebug((prev) => ({ ...prev, rotX: newValue }));
-            });
+    return () => folder.destroy();
+  }, []);
 
-        return () => folder.destroy();
-    }, []);
+  return (
+    <CubeCamera resolution={256} frames={Infinity} near={1} far={1000}>
+      {(texture) => {
+        if (materialRef.current) {
+          materialRef.current.envMap = texture;
+          materialRef.current.needsUpdate = true;
+        }
 
-    return (
-        <CubeCamera resolution={256} frames={Infinity} near={1} far={1000}>
-            {(texture) => {
-                if (materialRef.current) {
-                    materialRef.current.envMap = texture;
-                    materialRef.current.needsUpdate = true
-                }
-
-                return (
-                    <primitive
-                        object={head.scene}
-                        scale={headDebug.scale}
-                        position={[
-                            headDebug.position.x,
-                            headDebug.position.y,
-                            headDebug.position.z,
-                        ]}
-                        rotation={[
-                            headDebug.rotation.rotX,
-                            headDebug.rotation.rotY,
-                            headDebug.rotation.rotZ,
-                        ]}
-                    />
-                )
-            }}
-            {/* <mesh ref={meshRef}>
+        return (
+          <primitive
+            object={head.scene}
+            scale={headDebug.scale}
+            position={[
+              headDebug.position.x,
+              headDebug.position.y,
+              headDebug.position.z,
+            ]}
+            rotation={[
+              headDebug.rotation.rotX,
+              headDebug.rotation.rotY,
+              headDebug.rotation.rotZ,
+            ]}
+          />
+        );
+      }}
+      {/* <mesh ref={meshRef}>
                 <sphereGeometry args={[props.radius, 32, 32]} />
                 <meshStandardMaterial color={"white"} wireframe />
             </mesh> */}
-        </CubeCamera>
-    );
+    </CubeCamera>
+  );
 };
 
 export default Planet;

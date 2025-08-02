@@ -19,6 +19,7 @@ import LiquidMaterial from "../LiquidMaterial";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
+import { Icosahedron } from "@react-three/drei";
 
 interface EnvironmentProps {
   bDisableOrbitControls: boolean;
@@ -184,14 +185,21 @@ const Environment = (props: EnvironmentProps) => {
           skySettings.sunPosition.z,
         ]}
       /> */}
-      <mesh position={[0, 20, 0]} rotation={[degToRad(70), degToRad(20), 0]}>
-        <sphereGeometry attach="geometry" args={[600, 600]} rotateZ={90} />
+      <Icosahedron args={[600]}>
         <liquidMaterial
           ref={liquidMaterialRef}
           attach={"material"}
           side={THREE.BackSide}
         />
-      </mesh>
+      </Icosahedron>
+      {/* <mesh position={[0, 20, 0]} rotation={[degToRad(70), degToRad(20), 0]}>
+        <sphereGeometry attach="geometry" args={[600, 600]} rotateZ={90} />
+        <material
+          ref={liquidMaterialRef}
+          attach={"material"}
+          side={THREE.BackSide}
+        />
+      </mesh> */}
       <EffectComposer>
         <Vignette
           offset={0.5}
