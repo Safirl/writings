@@ -5,7 +5,7 @@ import SceneCanvas from "./three/SceneCanvas";
 import { useState } from "react";
 
 const Main = () => {
-  const [bDisplayWelcome, setDisplayWelcome] = useState(false);
+  const [bDisplayWelcome, setDisplayWelcome] = useState(true);
   function handleEnterClick() {
     setDisplayWelcome(false);
   }

@@ -1,25 +1,22 @@
-import { Circle, OrbitControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import Fog from "./Fog";
 import { useEffect, useRef, useState } from "react";
 import type GUI from "lil-gui";
 import getOrCreateGUI from "./debugUI";
 import WaterPlane from "./Water";
-import { Sky } from "@react-three/drei";
 import {
-  DepthOfField,
   EffectComposer,
-  ChromaticAberration,
   Vignette,
-  TiltShift,
 } from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
+import { BlendFunction, KernelSize } from "postprocessing";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import LiquidMaterial from "../LiquidMaterial";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { degToRad, radToDeg } from "three/src/math/MathUtils.js";
 import { Icosahedron } from "@react-three/drei";
+import BackLight from "./BackLight";
+import { GodRays, Bloom } from "@react-three/postprocessing";
 
 interface EnvironmentProps {
   bDisableOrbitControls: boolean;
@@ -27,6 +24,7 @@ interface EnvironmentProps {
 
 const Environment = (props: EnvironmentProps) => {
   const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
+  const sunRef = useRef<THREE.Mesh>(null!);
 
   const [cameraSettings, setCameraSettings] = useState({
     zoomMin: 153,
@@ -44,6 +42,7 @@ const Environment = (props: EnvironmentProps) => {
     mieCoefficient: 0.1,
     mieDirectionalG: 0.95,
     sunPosition: { x: 0.3, y: -0.038, z: -0.95 },
+    shaderRepetion: 5.
   });
 
   useEffect(() => {
@@ -150,6 +149,14 @@ const Environment = (props: EnvironmentProps) => {
       .onChange((newValue: number) => {
         setSkySettings((prev) => ({ ...prev, mieCoefficient: newValue }));
       });
+    skyFolder
+      .add(skySettings, "shaderRepetion")
+      .min(0)
+      .max(100)
+      .step(0.1)
+      .onChange((newValue: number) => {
+        setSkySettings((prev) => ({ ...prev, shaderRepetion: newValue }));
+      });
 
     return () => {
       folder.destroy();
@@ -159,9 +166,10 @@ const Environment = (props: EnvironmentProps) => {
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 5, 5]} intensity={0} />
-      <pointLight position={[10, 50, 100]} intensity={10000} />
+      {/* <ambientLight intensity={0} /> */}
+      <directionalLight position={[5, 5, 5]} intensity={3} />
+      {/* <pointLight position={[10, 50, 100]} intensity={20} /> */}
+      <BackLight lightRef={sunRef} />
       <OrbitControls
         enableRotate={cameraSettings.enableRotate}
         enablePan={false}
@@ -173,7 +181,7 @@ const Environment = (props: EnvironmentProps) => {
         rotateSpeed={cameraSettings.rotateSpeed}
         zoomSpeed={cameraSettings.zoomSpeed}
       />
-      {/* <Fog /> */}
+      <Fog />
       <WaterPlane />
       {/* <Sky
         turbidity={skySettings.turbidity}
@@ -185,13 +193,42 @@ const Environment = (props: EnvironmentProps) => {
           skySettings.sunPosition.z,
         ]}
       /> */}
-      <Icosahedron args={[600]}>
-        <liquidMaterial
+      <Icosahedron args={[600, 1]} material={new THREE.MeshStandardMaterial({ color: "black" })}>
+        {/* <liquidMaterial
           ref={liquidMaterialRef}
           attach={"material"}
           side={THREE.BackSide}
-        />
+          uRepetition={skySettings.shaderRepetion}
+        /> */}
       </Icosahedron>
+      <EffectComposer multisampling={0}>
+        {/* <GodRays
+          sun={sunRef}
+          blendFunction={BlendFunction.SCREEN} // The blend function of this effect.
+          samples={60} // The number of samples per pixel.
+          density={0.96} // The density of the light rays.
+          decay={0.9} // An illumination decay factor.
+          weight={0.9} // A light ray weight factor.
+          exposure={0.6} // A constant attenuation coefficient.
+          clampMax={.5} // An upper bound for the saturation of the overall effect.
+          kernelSize={KernelSize.SMALL} // The blur kernel size. Has no effect if blur is disabled.
+          blur={true} // Whether the god rays should be blurred to reduce artifacts.
+          /> */}
+        <Bloom
+          intensity={1.0} // The bloom intensity.
+          blurPass={undefined} // A blur pass.
+          kernelSize={KernelSize.LARGE} // blur kernel size
+          luminanceThreshold={1} // luminance threshold. Raise this value to mask out darker elements in the scene.
+          luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
+          mipmapBlur={true} // Enables or disables mipmap blur.
+        />
+        <Vignette
+          offset={0.5}
+          darkness={cameraSettings.vignetteDarkness}
+          eskil={false}
+          blendFunction={BlendFunction.NORMAL}
+        />
+      </EffectComposer>
       {/* <mesh position={[0, 20, 0]} rotation={[degToRad(70), degToRad(20), 0]}>
         <sphereGeometry attach="geometry" args={[600, 600]} rotateZ={90} />
         <material
@@ -200,14 +237,6 @@ const Environment = (props: EnvironmentProps) => {
           side={THREE.BackSide}
         />
       </mesh> */}
-      <EffectComposer>
-        <Vignette
-          offset={0.5}
-          darkness={cameraSettings.vignetteDarkness}
-          eskil={false}
-          blendFunction={BlendFunction.NORMAL}
-        />
-      </EffectComposer>
     </>
   );
 };

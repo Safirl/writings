@@ -6,7 +6,7 @@ import getGUI from "./debugUI";
 const Fog = () => {
   const [fogDensity, setFogDensity] = useState({
     near: 90,
-    far: 200,
+    far: 668,
   });
   useEffect(() => {
     const gui = getGUI();

@@ -402,6 +402,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
                 <planeGeometry args={[32, 24]} />
                 <meshStandardMaterial color="#0F0F0F" side={THREE.BackSide} />
             </mesh>
+            <pointLight position={[10, 50, 100]} intensity={10000} />
         </group>
     );
 };

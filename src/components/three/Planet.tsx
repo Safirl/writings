@@ -13,9 +13,7 @@ const Planet = (props: PlanetProps) => {
   const head = useGLTF("./3D/head.glb");
   const materialRef = useRef<THREE.MeshStandardMaterial>(
     new THREE.MeshStandardMaterial({
-      color: "white",
-      metalness: 1,
-      roughness: 0.1,
+      color: "white"
     })
   );
   const [headDebug, setHeadDebug] = useState({
@@ -23,7 +21,7 @@ const Planet = (props: PlanetProps) => {
     // scale: 700,
     // rotation: { rotX: 5.5, rotY: 0, rotZ: Math.PI / 3 },
     position: { x: 0, y: 13.2, z: 0 },
-    scale: 4.5,
+    scale: 1,
     rotation: { rotX: 0, rotY: 0, rotZ: 0 },
   });
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
