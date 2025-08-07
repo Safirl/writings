@@ -13,7 +13,7 @@ const Planet = (props: PlanetProps) => {
   const head = useGLTF("./3D/head.glb");
   const materialRef = useRef<THREE.MeshStandardMaterial>(
     new THREE.MeshStandardMaterial({
-      color: "white"
+      color: "white",
     })
   );
   const [headDebug, setHeadDebug] = useState({

@@ -7,6 +7,7 @@ import WaterPlane from "./Water";
 import {
   EffectComposer,
   Vignette,
+  Bloom
 } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize } from "postprocessing";
 import { useGSAP } from "@gsap/react";
@@ -16,8 +17,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { Icosahedron } from "@react-three/drei";
 import BackLight from "./BackLight";
-import { GodRays, Bloom } from "@react-three/postprocessing";
-
+import FloatingRocksParticles from "./FloatingRocksParticles";
 interface EnvironmentProps {
   bDisableOrbitControls: boolean;
 }
@@ -58,7 +58,7 @@ const Environment = (props: EnvironmentProps) => {
     const gsapState = { darkness: cameraSettings.vignetteDarkness };
     setTimeout(() => {
       gsap.to(gsapState, {
-        darkness: props.bDisableOrbitControls ? 10 : 0.5,
+        darkness: props.bDisableOrbitControls ? 2.5 : 0.5,
         duration: 8,
         ease: "power2.in",
         onUpdate() {
@@ -166,9 +166,9 @@ const Environment = (props: EnvironmentProps) => {
 
   return (
     <>
-      {/* <ambientLight intensity={0} /> */}
-      <directionalLight position={[5, 5, 5]} intensity={3} />
-      {/* <pointLight position={[10, 50, 100]} intensity={20} /> */}
+      <ambientLight intensity={0.1} />
+      <directionalLight position={[5, 5, 5]} intensity={2.5} />
+      {/* <pointLight position={[10, 50, 100]} intensity={200} /> */}
       <BackLight lightRef={sunRef} />
       <OrbitControls
         enableRotate={cameraSettings.enableRotate}
@@ -201,6 +201,7 @@ const Environment = (props: EnvironmentProps) => {
           uRepetition={skySettings.shaderRepetion}
         /> */}
       </Icosahedron>
+      <FloatingRocksParticles count={200} />
       <EffectComposer multisampling={0}>
         {/* <GodRays
           sun={sunRef}
@@ -215,11 +216,11 @@ const Environment = (props: EnvironmentProps) => {
           blur={true} // Whether the god rays should be blurred to reduce artifacts.
           /> */}
         <Bloom
-          intensity={1.0} // The bloom intensity.
+          intensity={.8} // The bloom intensity.
           blurPass={undefined} // A blur pass.
           kernelSize={KernelSize.LARGE} // blur kernel size
           luminanceThreshold={1} // luminance threshold. Raise this value to mask out darker elements in the scene.
-          luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
+          luminanceSmoothing={.025} // smoothness of the luminance threshold. Range is [0, 1]
           mipmapBlur={true} // Enables or disables mipmap blur.
         />
         <Vignette

@@ -10,15 +10,15 @@ const projects = [
     id: 1,
     title: "test",
     imgURL: "./projectImages/project1.jpg",
-    phi: Math.PI,
-    theta: Math.PI,
+    phi: 2.83371657353799,
+    theta: -2.72552,
   },
   {
     id: 2,
     title: "test",
     imgURL: "./projectImages/project1.jpg",
-    phi: Math.PI,
-    theta: Math.PI,
+    phi: 2.833,
+    theta: 0.59032,
   },
 ];
 

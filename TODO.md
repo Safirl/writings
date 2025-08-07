@@ -1,5 +1,8 @@
 Notes des choses restantes à faire :
-[]- Particules
+//prettier-ignore
+[]- Particules 
+    - particules de fragments de pierres qui s'élèvent dans le ciel 
+    - particules de poussières
 []- Placer correctement les images
 [X]- animation de hover
 []- transitions entre la page d'accueil et le projet

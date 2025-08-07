@@ -177,16 +177,6 @@ const InteractiveCard = (props: InteractiveCardProps) => {
         });
     });
 
-    const handlePointerMove = () => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
-        setIsPointerMoving(true);
-        timeoutRef.current = window.setTimeout(() => {
-            setIsPointerMoving(false);
-        }, 200);
-    };
-
     const zoomAnimation = contextSafe(() => {
         if (!meshRef.current || !camera) return;
 
@@ -205,6 +195,16 @@ const InteractiveCard = (props: InteractiveCardProps) => {
             ease: "sine.inOut",
         });
     });
+
+    const handlePointerMove = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        setIsPointerMoving(true);
+        timeoutRef.current = window.setTimeout(() => {
+            setIsPointerMoving(false);
+        }, 200);
+    };
 
     //Dissolve animation
     useGSAP(() => {

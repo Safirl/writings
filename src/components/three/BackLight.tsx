@@ -36,7 +36,7 @@ const BackLight = (props: backLightProps) => {
         <>
             <group position={[5, 50, -500]} scale={[1, 1, 1]} rotation={[0, Math.PI, 0]} >
                 <rectAreaLight intensity={5} color={"white"} width={200} height={(500)} />
-                <Plane ref={props.lightRef} args={[200, 500, 200, 200]} material={new THREE.MeshStandardMaterial({ color: "white", fog: false, transparent: true, emissive: "white", emissiveIntensity: 2, toneMapped: false })} rotation={[0, Math.PI, 0]} >
+                <Plane ref={props.lightRef} args={[200, 600, 200, 200]} material={new THREE.MeshStandardMaterial({ color: "white", fog: false, transparent: true, emissive: "white", emissiveIntensity: 2, toneMapped: false })} rotation={[0, Math.PI, 0]} >
                     {/* <liquidMaterial ref={liquidMaterialRef} uRepetition={5.} /> */}
                 </Plane>
             </group>
