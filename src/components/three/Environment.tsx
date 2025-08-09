@@ -19,8 +19,12 @@ import { Icosahedron } from "@react-three/drei";
 import BackLight from "./BackLight";
 import FloatingRocksParticles from "./FloatingRocksParticles";
 interface EnvironmentProps {
-  bDisableOrbitControls: boolean;
+  isCardClicked: boolean;
 }
+const PARTICLE_POSITIONS = [{
+  originalPos: { x: 0, y: 0, z: 0 },
+  finalPos: { x: 0, y: 100, z: 0 }
+}]
 
 const Environment = (props: EnvironmentProps) => {
   const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
@@ -35,9 +39,8 @@ const Environment = (props: EnvironmentProps) => {
     maxPolarAngle: Math.PI / 2,
     enableZoom: true,
     enableRotate: true,
+    vignetteDarkness: .5
   });
-
-  const [vignetteDarkness, setVignetteDarkness] = useState(.5);
 
   const [skySettings, setSkySettings] = useState({
     turbidity: 10,
@@ -46,33 +49,25 @@ const Environment = (props: EnvironmentProps) => {
     sunPosition: { x: 0.3, y: -0.038, z: -0.95 },
     shaderRepetion: 5.
   });
-  const particlePos = [{
-    originalPos: { x: 0, y: 0, z: 0 },
-    finalPos: { x: 0, y: 100, z: 0 }
-  }]
-
-  useEffect(() => {
-    console.log("coucou")
-  })
 
   useEffect(() => {
     setCameraSettings((prev) => ({
       ...prev,
-      enableZoom: !props.bDisableOrbitControls,
-      enableRotate: !props.bDisableOrbitControls,
-      zoomMin: props.bDisableOrbitControls ? 0 : 153,
+      enableZoom: !props.isCardClicked,
+      enableRotate: !props.isCardClicked,
+      zoomMin: props.isCardClicked ? 0 : 153,
     }));
-  }, [props.bDisableOrbitControls]);
+  }, [props.isCardClicked]);
 
   useGSAP(() => {
-    const gsapState = { darkness: vignetteDarkness };
+    const gsapState = { darkness: cameraSettings.vignetteDarkness };
     setTimeout(() => {
       gsap.to(gsapState, {
-        darkness: props.bDisableOrbitControls ? 2.5 : 0.5,
+        darkness: props.isCardClicked ? 2.5 : 0.5,
         duration: 8,
         ease: "power2.in",
         onUpdate() {
-          setVignetteDarkness(gsapState.darkness)
+          setCameraSettings((prev) => ({ ...prev, vignetteDarkness: gsapState.darkness }));
         },
       });
     }, 500);
@@ -80,13 +75,13 @@ const Environment = (props: EnvironmentProps) => {
       const transitionObject = document.getElementById("transitionObject");
       if (!transitionObject) return;
       gsap.to(transitionObject.style, {
-        opacity: props.bDisableOrbitControls ? 1 : 0,
+        opacity: props.isCardClicked ? 1 : 0,
         duration: 2,
         ease: "power2.inOut",
       });
       transitionObject.style.opacity;
     }, 4500);
-  }, [props.bDisableOrbitControls]);
+  }, [props.isCardClicked]);
 
   useFrame((state) => {
     if (!liquidMaterialRef.current) return;
@@ -208,7 +203,7 @@ const Environment = (props: EnvironmentProps) => {
           uRepetition={skySettings.shaderRepetion}
         /> */}
       </Icosahedron>
-      <FloatingRocksParticles count={1} originalPos={particlePos[0].originalPos} finalPos={particlePos[0].finalPos} />
+      <FloatingRocksParticles count={1} originalPos={PARTICLE_POSITIONS[0].originalPos} finalPos={PARTICLE_POSITIONS[0].finalPos} />
       <EffectComposer multisampling={0}>
         {/* <GodRays
           sun={sunRef}
@@ -232,7 +227,7 @@ const Environment = (props: EnvironmentProps) => {
         />
         <Vignette
           offset={0.5}
-          darkness={vignetteDarkness}
+          darkness={cameraSettings.vignetteDarkness}
           eskil={false}
           blendFunction={BlendFunction.NORMAL}
         />

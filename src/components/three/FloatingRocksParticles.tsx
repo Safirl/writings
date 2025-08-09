@@ -31,7 +31,6 @@ const FloatingRocksParticles = (props: particlesProps) => {
             // Temps de départ relatif (en secondes depuis le début)
             startTimesRef.current[i] = Math.random() * 5;
             durationsRef.current[i] = 3 + Math.random() * 2;
-            // console.log("start time", durationsRef.current[i])
         }
         return positions;
     }, [count, originalPos, finalPos]);

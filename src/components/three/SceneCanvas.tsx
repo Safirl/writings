@@ -9,10 +9,10 @@ import projects from "../../data/projects";
 
 const SceneCanvas = () => {
   const [radius, setRadius] = useState<number>(95);
-  const [bDisableOrbitControls, setDisableOrbitControls] = useState(false);
+  const [isCardClicked, setIsCardClicked] = useState(false);
 
   function onCardClicked() {
-    setDisableOrbitControls(true);
+    setIsCardClicked(true);
   }
 
   return (
@@ -21,7 +21,7 @@ const SceneCanvas = () => {
         {/* Debug */}
         <StatsGl />
         {/* End of debug */}
-        <Environment bDisableOrbitControls={bDisableOrbitControls} />
+        <Environment isCardClicked={isCardClicked} />
         {projects.map((project) => {
           return (
             <InteractiveCard
