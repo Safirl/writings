@@ -33,12 +33,40 @@ const WaterPlane = () => {
 
         water.rotation.x = -Math.PI / 2;
         water.position.y = -5;
+
+        water.traverse(obj => {
+            if (obj) {
+                const oldBefore = obj.onBeforeRender;
+                const oldAfter = obj.onAfterRender;
+
+                obj.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
+                    hideParticles();
+                    if (oldBefore) oldBefore(renderer, scene, camera, geometry, material, group);
+                };
+
+                obj.onAfterRender = (renderer, scene, camera, geometry, material, group) => {
+                    showParticles();
+                    if (oldAfter) oldAfter(renderer, scene, camera, geometry, material, group);
+                };
+            }
+        });
+
+
+        const hideParticles = () => {
+            scene.traverse(obj => {
+                if (obj.userData.noReflection) {
+                    obj.visible = false;
+                }
+            });
+        };
+        const showParticles = () => {
+            scene.traverse(obj => {
+                if (obj.userData.noReflection) obj.visible = true;
+            });
+        };
+
         ref.current.add(water);
         waterRef.current = water;
-
-        // waterRef.current.material.transparent = true;
-        // waterRef.current.material.opacity = 0.5;
-        // waterRef.current.material.depthWrite = false;
     }, [normalMap]);
 
     useFrame((_, delta) => {

@@ -78,7 +78,7 @@ const FloatingRocksParticles = (props: particlesProps) => {
     });
 
     return (
-        <points ref={points}>
+        <points ref={points} userData={{ noReflection: true }} visible={false}>
             <bufferGeometry>
                 <bufferAttribute
                     args={[particlesPosition, 3]}
@@ -88,7 +88,7 @@ const FloatingRocksParticles = (props: particlesProps) => {
                     itemSize={3}
                 />
             </bufferGeometry>
-            <pointsMaterial ref={materialRef} size={10} color="#5786F5" sizeAttenuation depthWrite={true} />
+            <pointsMaterial ref={materialRef} size={5} color="#5786F5" sizeAttenuation={false} depthWrite={true} />
         </points>
     )
 }

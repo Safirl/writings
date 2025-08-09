@@ -21,10 +21,19 @@ import FloatingRocksParticles from "./FloatingRocksParticles";
 interface EnvironmentProps {
   isCardClicked: boolean;
 }
-const PARTICLE_POSITIONS = [{
-  originalPos: { x: 0, y: 0, z: 0 },
-  finalPos: { x: 0, y: 100, z: 0 }
-}]
+const PARTICLES = [
+  {
+    count: 5,
+    originalPos: { x: 100, y: 0, z: 0 },
+    finalPos: { x: 0, y: 100, z: 0 }
+  },
+  {
+    count: 5,
+    originalPos: { x: -100, y: 0, z: 0 },
+    finalPos: { x: 0, y: 100, z: 0 }
+  }
+]
+
 
 const Environment = (props: EnvironmentProps) => {
   const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
@@ -184,7 +193,7 @@ const Environment = (props: EnvironmentProps) => {
         zoomSpeed={cameraSettings.zoomSpeed}
       />
       <Fog />
-      {/* <WaterPlane /> */}
+      <WaterPlane />
       {/* <Sky
         turbidity={skySettings.turbidity}
         mieCoefficient={skySettings.mieCoefficient}
@@ -203,7 +212,12 @@ const Environment = (props: EnvironmentProps) => {
           uRepetition={skySettings.shaderRepetion}
         /> */}
       </Icosahedron>
-      <FloatingRocksParticles count={1} originalPos={PARTICLE_POSITIONS[0].originalPos} finalPos={PARTICLE_POSITIONS[0].finalPos} />
+      {PARTICLES.map((PARTICLE) => {
+        return (
+          <FloatingRocksParticles count={PARTICLE.count} originalPos={PARTICLE.originalPos} finalPos={PARTICLE.finalPos} />
+        );
+      })}
+      <FloatingRocksParticles count={PARTICLES[0].count} originalPos={PARTICLES[0].originalPos} finalPos={PARTICLES[0].finalPos} />
       <EffectComposer multisampling={0}>
         {/* <GodRays
           sun={sunRef}

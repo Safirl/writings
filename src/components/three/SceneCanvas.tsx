@@ -17,7 +17,7 @@ const SceneCanvas = () => {
 
   return (
     <Suspense fallback={null}>
-      <Canvas camera={{ position: [0, 10, 200], fov: 75 }}>
+      <Canvas camera={{ position: [0, 10, 200], fov: 75, userData: { isMainCamera: true } }}>
         {/* Debug */}
         <StatsGl />
         {/* End of debug */}
@@ -38,7 +38,7 @@ const SceneCanvas = () => {
             />
           );
         })}
-        {/* <Planet onChangeRadius={setRadius} radius={radius} /> */}
+        <Planet onChangeRadius={setRadius} radius={radius} />
       </Canvas>
       <div
         id="transitionObject"
