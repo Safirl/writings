@@ -35,8 +35,10 @@ const Environment = (props: EnvironmentProps) => {
     maxPolarAngle: Math.PI / 2,
     enableZoom: true,
     enableRotate: true,
-    vignetteDarkness: 0.5,
   });
+
+  const [vignetteDarkness, setVignetteDarkness] = useState(.5);
+
   const [skySettings, setSkySettings] = useState({
     turbidity: 10,
     mieCoefficient: 0.1,
@@ -44,6 +46,14 @@ const Environment = (props: EnvironmentProps) => {
     sunPosition: { x: 0.3, y: -0.038, z: -0.95 },
     shaderRepetion: 5.
   });
+  const particlePos = [{
+    originalPos: { x: 0, y: 0, z: 0 },
+    finalPos: { x: 0, y: 100, z: 0 }
+  }]
+
+  useEffect(() => {
+    console.log("coucou")
+  })
 
   useEffect(() => {
     setCameraSettings((prev) => ({
@@ -55,17 +65,14 @@ const Environment = (props: EnvironmentProps) => {
   }, [props.bDisableOrbitControls]);
 
   useGSAP(() => {
-    const gsapState = { darkness: cameraSettings.vignetteDarkness };
+    const gsapState = { darkness: vignetteDarkness };
     setTimeout(() => {
       gsap.to(gsapState, {
         darkness: props.bDisableOrbitControls ? 2.5 : 0.5,
         duration: 8,
         ease: "power2.in",
         onUpdate() {
-          setCameraSettings((prev) => ({
-            ...prev,
-            vignetteDarkness: gsapState.darkness,
-          }));
+          setVignetteDarkness(gsapState.darkness)
         },
       });
     }, 500);
@@ -182,7 +189,7 @@ const Environment = (props: EnvironmentProps) => {
         zoomSpeed={cameraSettings.zoomSpeed}
       />
       <Fog />
-      <WaterPlane />
+      {/* <WaterPlane /> */}
       {/* <Sky
         turbidity={skySettings.turbidity}
         mieCoefficient={skySettings.mieCoefficient}
@@ -201,7 +208,7 @@ const Environment = (props: EnvironmentProps) => {
           uRepetition={skySettings.shaderRepetion}
         /> */}
       </Icosahedron>
-      <FloatingRocksParticles count={200} />
+      <FloatingRocksParticles count={1} originalPos={particlePos[0].originalPos} finalPos={particlePos[0].finalPos} />
       <EffectComposer multisampling={0}>
         {/* <GodRays
           sun={sunRef}
@@ -225,7 +232,7 @@ const Environment = (props: EnvironmentProps) => {
         />
         <Vignette
           offset={0.5}
-          darkness={cameraSettings.vignetteDarkness}
+          darkness={vignetteDarkness}
           eskil={false}
           blendFunction={BlendFunction.NORMAL}
         />

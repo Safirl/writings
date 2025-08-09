@@ -4,49 +4,75 @@ import * as THREE from "three"
 
 interface particlesProps {
     count: number;
+    originalPos: { x: number, y: number, z: number }
+    finalPos: { x: number, y: number, z: number }
 }
 
 const FloatingRocksParticles = (props: particlesProps) => {
-    const { count } = props;
+    const { count, originalPos, finalPos } = props;
 
-    // This reference gives us direct access to our points
     const points = useRef<THREE.Points>(null!);
+    const materialRef = useRef<THREE.PointsMaterial>(null!);
+
+    const startTimesRef = useRef<Float32Array>(new Float32Array(count));
+    const durationsRef = useRef<Float32Array>(new Float32Array(count));
 
     // Generate our positions attributes array
     const particlesPosition = useMemo(() => {
         const positions = new Float32Array(count * 3);
-        const distance = 100;
 
         for (let i = 0; i < count; i++) {
+            const i3 = i * 3
 
-            // const theta = THREE.MathUtils.randFloatSpread(360);
-            // const phi = THREE.MathUtils.randFloatSpread(360);
+            positions[i3] = originalPos.x;
+            positions[i3 + 1] = originalPos.y;
+            positions[i3 + 2] = originalPos.z;
 
-            // let x = distance * Math.sin(theta) * Math.cos(phi)
-            // let y = distance * Math.sin(theta) * Math.sin(phi);
-            // let z = distance * Math.cos(theta);
-            let x = 0;
-            let y = 0;
-            let z = 0;
-
-            positions.set([x, y, z], i * 3);
+            // Temps de départ relatif (en secondes depuis le début)
+            startTimesRef.current[i] = Math.random() * 5;
+            durationsRef.current[i] = 3 + Math.random() * 2;
+            // console.log("start time", durationsRef.current[i])
         }
-
-
         return positions;
-    }, [count]);
+    }, [count, originalPos, finalPos]);
 
     useFrame((state) => {
         const { clock } = state;
+        const currentTime = clock.getElapsedTime();
+
+        // Temps relatif depuis le début de l'animation
+        const positions = points.current.geometry.attributes.position.array as Float32Array;
 
         for (let i = 0; i < count; i++) {
             const i3 = i * 3;
+            const particleStartTime = startTimesRef.current[i];
+            const localTime = currentTime - particleStartTime;
 
+            // Si l'animation n'a pas encore commencé
+            if (localTime < 0) {
+                positions[i3] = originalPos.x;
+                positions[i3 + 1] = originalPos.y;
+                positions[i3 + 2] = originalPos.z;
+                continue;
+            }
 
-            // points.current.geometry.attributes.position.array[i3] += Math.sin(clock.elapsedTime + Math.random() * 10) * 0.01;
-            // points.current.geometry.attributes.position.array[i3 + 1] += Math.cos(clock.elapsedTime + Math.random() * 10) * 0.01;
-            // points.current.geometry.attributes.position.array[i3 + 2] += Math.sin(clock.elapsedTime + Math.random() * 10) * 0.01;
-            points.current.geometry.attributes.position.array[i3 + 1] += Math.cos(clock.elapsedTime) + .5
+            const duration = durationsRef.current[i];
+            const t = localTime / duration;
+
+            // Si l'animation est terminée, reset
+            if (t >= 1) {
+                positions[i3] = originalPos.x;
+                positions[i3 + 1] = originalPos.y;
+                positions[i3 + 2] = originalPos.z;
+                // Programmer le prochain cycle
+                startTimesRef.current[i] = currentTime + Math.random() * 2;
+                continue;
+            }
+
+            // Animation en cours
+            positions[i3 + 1] = THREE.MathUtils.lerp(originalPos.y, finalPos.y, t);
+            positions[i3 + 0] = originalPos.x + Math.sin(t * Math.PI * 2 + i) * 2;
+            positions[i3 + 2] = originalPos.z + Math.cos(t * Math.PI * 2 + i) * 2;
         }
 
         points.current.geometry.attributes.position.needsUpdate = true;
@@ -63,7 +89,7 @@ const FloatingRocksParticles = (props: particlesProps) => {
                     itemSize={3}
                 />
             </bufferGeometry>
-            <pointsMaterial size={10} color="#5786F5" sizeAttenuation depthWrite={true} />
+            <pointsMaterial ref={materialRef} size={10} color="#5786F5" sizeAttenuation depthWrite={true} />
         </points>
     )
 }

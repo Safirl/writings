@@ -38,7 +38,7 @@ const SceneCanvas = () => {
             />
           );
         })}
-        <Planet onChangeRadius={setRadius} radius={radius} />
+        {/* <Planet onChangeRadius={setRadius} radius={radius} /> */}
       </Canvas>
       <div
         id="transitionObject"
