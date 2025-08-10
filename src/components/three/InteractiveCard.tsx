@@ -169,8 +169,8 @@ const InteractiveCard = (props: InteractiveCardProps) => {
             x: targetPosition.x,
             y: targetPosition.y,
             z: targetPosition.z,
-            duration: 3,
-            ease: "sine.inOut",
+            duration: 2,
+            ease: "power2.inOut",
             onComplete: () => {
                 zoomAnimation();
             },

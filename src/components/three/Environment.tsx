@@ -13,7 +13,7 @@ import { BlendFunction, KernelSize } from "postprocessing";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import LiquidMaterial from "../LiquidMaterial";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { Icosahedron } from "@react-three/drei";
 import BackLight from "./BackLight";
@@ -23,21 +23,42 @@ interface EnvironmentProps {
 }
 const PARTICLES = [
   {
+    id: 0,
     count: 5,
     originalPos: { x: 100, y: 0, z: 0 },
-    finalPos: { x: 0, y: 100, z: 0 }
+    finalPos: { x: 0, y: 60, z: 0 }
   },
   {
+    id: 1,
     count: 5,
-    originalPos: { x: -100, y: 0, z: 0 },
-    finalPos: { x: 0, y: 100, z: 0 }
-  }
+    originalPos: { x: -100, y: 0, z: -50 },
+    finalPos: { x: 0, y: 60, z: 0 }
+  },
+  {
+    id: 2,
+    count: 5,
+    originalPos: { x: -80, y: 0, z: 120 },
+    finalPos: { x: 0, y: 60, z: 0 }
+  },
+  {
+    id: 3,
+    count: 5,
+    originalPos: { x: 60, y: 30, z: 80 },
+    finalPos: { x: 0, y: 60, z: 0 }
+  },
+  {
+    id: 4,
+    count: 5,
+    originalPos: { x: 60, y: 30, z: 80 },
+    finalPos: { x: 0, y: 60, z: 0 }
+  },
 ]
 
 
 const Environment = (props: EnvironmentProps) => {
   const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
   const sunRef = useRef<THREE.Mesh>(null!);
+  const colorMap = useLoader(THREE.TextureLoader, 'textures/dust.png')
 
   const [cameraSettings, setCameraSettings] = useState({
     zoomMin: 153,
@@ -79,7 +100,7 @@ const Environment = (props: EnvironmentProps) => {
           setCameraSettings((prev) => ({ ...prev, vignetteDarkness: gsapState.darkness }));
         },
       });
-    }, 500);
+    }, 300);
     setTimeout(() => {
       const transitionObject = document.getElementById("transitionObject");
       if (!transitionObject) return;
@@ -89,7 +110,7 @@ const Environment = (props: EnvironmentProps) => {
         ease: "power2.inOut",
       });
       transitionObject.style.opacity;
-    }, 4500);
+    }, 2800);
   }, [props.isCardClicked]);
 
   useFrame((state) => {
@@ -214,10 +235,9 @@ const Environment = (props: EnvironmentProps) => {
       </Icosahedron>
       {PARTICLES.map((PARTICLE) => {
         return (
-          <FloatingRocksParticles count={PARTICLE.count} originalPos={PARTICLE.originalPos} finalPos={PARTICLE.finalPos} />
+          <FloatingRocksParticles count={PARTICLE.count} originalPos={PARTICLE.originalPos} finalPos={PARTICLE.finalPos} colorMap={colorMap} id={PARTICLE.id} key={PARTICLE.id} />
         );
       })}
-      <FloatingRocksParticles count={PARTICLES[0].count} originalPos={PARTICLES[0].originalPos} finalPos={PARTICLES[0].finalPos} />
       <EffectComposer multisampling={0}>
         {/* <GodRays
           sun={sunRef}

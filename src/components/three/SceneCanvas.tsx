@@ -19,7 +19,7 @@ const SceneCanvas = () => {
     <Suspense fallback={null}>
       <Canvas camera={{ position: [0, 10, 200], fov: 75, userData: { isMainCamera: true } }}>
         {/* Debug */}
-        <StatsGl />
+        {/* <StatsGl /> */}
         {/* End of debug */}
         <Environment isCardClicked={isCardClicked} />
         {projects.map((project) => {

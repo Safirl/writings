@@ -1,21 +1,53 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three"
+import getOrCreateGUI from "./debugUI";
+import GUI from "lil-gui";
 
 interface particlesProps {
+    id: number
     count: number;
     originalPos: { x: number, y: number, z: number }
     finalPos: { x: number, y: number, z: number }
+    colorMap: THREE.Texture
 }
 
 const FloatingRocksParticles = (props: particlesProps) => {
-    const { count, originalPos, finalPos } = props;
+    const { count, originalPos, finalPos, id, colorMap } = props;
+
+    const [particleSize, setParticleSize] = useState({ size: 5 })
+    const [particleSpeed, setParticleSpeed] = useState({ speed: 5 })
 
     const points = useRef<THREE.Points>(null!);
     const materialRef = useRef<THREE.PointsMaterial>(null!);
 
     const startTimesRef = useRef<Float32Array>(new Float32Array(count));
     const durationsRef = useRef<Float32Array>(new Float32Array(count));
+
+    //gui
+    useEffect(() => {
+        const gui = getOrCreateGUI();
+        let folder: GUI;
+        if (!gui || id != 0) return;
+
+        folder = gui.addFolder("Particles");
+        folder.open(true);
+
+        folder
+            .add(particleSize, "size")
+            .min(0)
+            .max(20)
+            .onChange((newValue: number) => {
+                setParticleSize((prev) => ({ ...prev, size: newValue }));
+            });
+        folder
+            .add(particleSpeed, "speed")
+            .min(0)
+            .max(20)
+            .onChange((newValue: number) => {
+                setParticleSpeed((prev) => ({ ...prev, speed: newValue }));
+            });
+    }, [])
 
     // Generate our positions attributes array
     const particlesPosition = useMemo(() => {
@@ -30,10 +62,10 @@ const FloatingRocksParticles = (props: particlesProps) => {
 
             // Temps de départ relatif (en secondes depuis le début)
             startTimesRef.current[i] = Math.random() * 5;
-            durationsRef.current[i] = 3 + Math.random() * 2;
+            durationsRef.current[i] = particleSpeed.speed + Math.random() * 2;
         }
         return positions;
-    }, [count, originalPos, finalPos]);
+    }, [count, originalPos, finalPos, particleSpeed.speed]);
 
     useFrame((state) => {
         const { clock } = state;
@@ -88,7 +120,7 @@ const FloatingRocksParticles = (props: particlesProps) => {
                     itemSize={3}
                 />
             </bufferGeometry>
-            <pointsMaterial ref={materialRef} size={5} color="#5786F5" sizeAttenuation={false} depthWrite={true} />
+            <pointsMaterial map={colorMap} ref={materialRef} size={particleSize.size} transparent={true} alphaMap={colorMap} sizeAttenuation={true} depthWrite={true} />
         </points>
     )
 }
