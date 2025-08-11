@@ -1,0 +1,27 @@
+@use "../styles/variables";
+
+.container {
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+progress {
+  width: 200px;
+  height: 2px;
+  border: none;
+  overflow: hidden;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #222;
+}
+
+progress::-webkit-progress-value {
+  background-color: white;
+}
+
+progress::-moz-progress-bar {
+  background-color: white;
+}

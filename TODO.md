@@ -10,3 +10,4 @@ Notes des choses restantes à faire :
 [X]- shader interactiveCard
 [X]- click card animation
 [X]- background
+[]- Loading animation

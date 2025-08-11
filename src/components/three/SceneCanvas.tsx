@@ -16,7 +16,7 @@ const SceneCanvas = () => {
   }
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<Loading />}>
       <Canvas camera={{ position: [0, 10, 200], fov: 75, userData: { isMainCamera: true } }}>
         {/* Debug */}
         {/* <StatsGl /> */}

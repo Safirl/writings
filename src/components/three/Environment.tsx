@@ -93,7 +93,7 @@ const Environment = (props: EnvironmentProps) => {
     const gsapState = { darkness: cameraSettings.vignetteDarkness };
     setTimeout(() => {
       gsap.to(gsapState, {
-        darkness: props.isCardClicked ? 2.5 : 0.5,
+        darkness: props.isCardClicked ? 5 : 0.5,
         duration: 8,
         ease: "power2.in",
         onUpdate() {
