@@ -1,5 +1,4 @@
 Notes des choses restantes à faire :
-//prettier-ignore
 []- Particules 
     - particules de fragments de pierres qui s'élèvent dans le ciel 
     - particules de poussières
@@ -10,4 +9,5 @@ Notes des choses restantes à faire :
 [X]- shader interactiveCard
 [X]- click card animation
 [X]- background
-[]- Loading animation
+[X]- Loading animation
+[]- Sounds
