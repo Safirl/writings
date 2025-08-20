@@ -1,5 +1,5 @@
 import type { MouseEventHandler } from "react";
-import "../styles/welcome.module.scss";
+import styles from "../styles/welcome.module.scss";
 
 interface WelcomeProps {
   onEnterClicked: MouseEventHandler<HTMLButtonElement>;
@@ -23,7 +23,7 @@ const Welcome = (props: WelcomeProps) => {
           non amet, facilis at expedita. Saepe.
         </span>
       </p>
-      <button onClick={props.onEnterClicked}>Welcome to our agency</button>
+      <button className={styles.button} onClick={props.onEnterClicked}>Welcome to our agency</button>
     </main>
   );
 };

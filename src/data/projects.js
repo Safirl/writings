@@ -5,6 +5,16 @@ const projects = [
     imgURL: "./projectImages/project1.jpg",
     phi: 2.9845130209103,
     theta: -Math.PI / 2,
+    paragraphs: [
+      {
+        key: "h1",
+        value: "I like to buy flowers",
+      },
+      {
+        key: "p",
+        value: "I like to buy flowers",
+      },
+    ],
   },
   {
     id: 1,

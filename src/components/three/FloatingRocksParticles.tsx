@@ -16,7 +16,7 @@ const FloatingRocksParticles = (props: particlesProps) => {
     const { count, originalPos, finalPos, id, colorMap } = props;
 
     const [particleSize, setParticleSize] = useState({ size: 5 })
-    const [particleSpeed, setParticleSpeed] = useState({ speed: 5 })
+    const [particleSpeed, setParticleSpeed] = useState({ speed: 20 })
 
     const points = useRef<THREE.Points>(null!);
     const materialRef = useRef<THREE.PointsMaterial>(null!);
@@ -49,7 +49,7 @@ const FloatingRocksParticles = (props: particlesProps) => {
             });
     }, [])
 
-    // Generate our positions attributes array
+    // Generate buffer arrays
     const particlesPosition = useMemo(() => {
         const positions = new Float32Array(count * 3);
         const colors = new Float32Array(count * 4)

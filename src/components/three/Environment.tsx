@@ -18,6 +18,7 @@ import * as THREE from "three";
 import { Icosahedron } from "@react-three/drei";
 import BackLight from "./BackLight";
 import FloatingRocksParticles from "./FloatingRocksParticles";
+import DustParticles from "./DustParticles";
 interface EnvironmentProps {
   isCardClicked: boolean;
 }
@@ -58,7 +59,7 @@ const PARTICLES = [
 const Environment = (props: EnvironmentProps) => {
   const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
   const sunRef = useRef<THREE.Mesh>(null!);
-  const colorMap = useLoader(THREE.TextureLoader, 'textures/dust.png')
+  const particlesColorMap = useLoader(THREE.TextureLoader, 'textures/dust.png')
 
   const [cameraSettings, setCameraSettings] = useState({
     zoomMin: 153,
@@ -100,17 +101,7 @@ const Environment = (props: EnvironmentProps) => {
           setCameraSettings((prev) => ({ ...prev, vignetteDarkness: gsapState.darkness }));
         },
       });
-    }, 300);
-    setTimeout(() => {
-      const transitionObject = document.getElementById("transitionObject");
-      if (!transitionObject) return;
-      gsap.to(transitionObject.style, {
-        opacity: props.isCardClicked ? 1 : 0,
-        duration: 2,
-        ease: "power2.inOut",
-      });
-      transitionObject.style.opacity;
-    }, 2800);
+    }, 400);
   }, [props.isCardClicked]);
 
   useFrame((state) => {
@@ -235,9 +226,10 @@ const Environment = (props: EnvironmentProps) => {
       </Icosahedron>
       {PARTICLES.map((PARTICLE) => {
         return (
-          <FloatingRocksParticles count={PARTICLE.count} originalPos={PARTICLE.originalPos} finalPos={PARTICLE.finalPos} colorMap={colorMap} id={PARTICLE.id} key={PARTICLE.id} />
+          <FloatingRocksParticles count={PARTICLE.count} originalPos={PARTICLE.originalPos} finalPos={PARTICLE.finalPos} colorMap={particlesColorMap} id={PARTICLE.id} key={PARTICLE.id} />
         );
       })}
+      <DustParticles colorMap={particlesColorMap} count={500} />
       <EffectComposer multisampling={0}>
         {/* <GodRays
           sun={sunRef}

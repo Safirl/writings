@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import Loading from "../Loading";
 import Planet from "./Planet";
@@ -6,14 +6,38 @@ import Environment from "./Environment";
 import InteractiveCard from "./InteractiveCard";
 import { StatsGl } from "@react-three/drei";
 import projects from "../../data/projects";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
-const SceneCanvas = () => {
+interface SceneCanvasProps {
+  onDisplayCardContent: (id: number) => void;
+}
+
+const SceneCanvas = (props: SceneCanvasProps) => {
   const [radius, setRadius] = useState<number>(95);
   const [isCardClicked, setIsCardClicked] = useState(false);
+  const transitionObjectRef = useRef<HTMLDivElement>(null!)
+  const [currentCardId, setCurrentCardId] = useState<number>(null!)
 
-  function onCardClicked() {
+  const { contextSafe } = useGSAP();
+
+  function onCardClicked(id: number) {
+    setCurrentCardId(id);
     setIsCardClicked(true);
   }
+
+  useGSAP(() => {
+    if (!transitionObjectRef.current) return;
+    setTimeout(() => {
+
+      gsap.to(transitionObjectRef.current.style, {
+        opacity: isCardClicked ? 1 : 0,
+        duration: 2,
+        ease: "power2.inOut",
+        onComplete: () => { props.onDisplayCardContent(currentCardId) }
+      });
+    }, 3000);
+  }, [isCardClicked])
 
   return (
     <Suspense fallback={<Loading />}>
@@ -41,6 +65,7 @@ const SceneCanvas = () => {
         <Planet onChangeRadius={setRadius} radius={radius} />
       </Canvas>
       <div
+        ref={transitionObjectRef}
         id="transitionObject"
         style={{
           position: "absolute",

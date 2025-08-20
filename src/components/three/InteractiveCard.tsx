@@ -14,7 +14,7 @@ interface InteractiveCardProps {
     id: number;
     text: string;
     imgURL: string;
-    onCardClicked: () => void;
+    onCardClicked: (id: number) => void;
 }
 
 interface TextureLoadingState {
@@ -42,12 +42,10 @@ function createCardtexture(
 
         const image = new Image();
 
-        // Gestion d'erreur de chargement d'image
         image.onerror = () => {
             reject(new Error(`Can't load image: ${imgURL}`));
         };
 
-        // Timeout pour éviter les chargements infinis
         const timeout = setTimeout(() => {
             reject(new Error(`Timeout for image: ${imgURL}`));
         }, 10000);
@@ -155,7 +153,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
         if (!meshRef.current || !camera || bIsPointerMoving || bHasBeenClicked)
             return;
         //notify the parent that the card has been clicked
-        props.onCardClicked();
+        props.onCardClicked(props.id);
         setHasBeenClicked(true);
 
         const forward = new THREE.Vector3();
@@ -169,7 +167,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
             x: targetPosition.x,
             y: targetPosition.y,
             z: targetPosition.z,
-            duration: 2,
+            duration: 3,
             ease: "power2.inOut",
             onComplete: () => {
                 zoomAnimation();
