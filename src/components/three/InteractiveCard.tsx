@@ -15,6 +15,7 @@ interface InteractiveCardProps {
     text: string;
     imgURL: string;
     onCardClicked: (id: number) => void;
+    canBeClicked: boolean
 }
 
 interface TextureLoadingState {
@@ -98,7 +99,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     const materialRef = useRef<THREE.Material>(null!);
     const timeoutRef = useRef<number | null>(null);
     let [bIsPointerMoving, setIsPointerMoving] = useState(false);
-    let [bHasBeenClicked, setHasBeenClicked] = useState(false);
+    const { canBeClicked } = props
     const { camera } = useThree();
 
     const [angle, setAngle] = useState<{ theta: number; phi: number }>({
@@ -123,7 +124,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     const { contextSafe } = useGSAP();
 
     const onCardHovered = contextSafe(() => {
-        if (bHasBeenClicked) return;
+        if (!canBeClicked) return;
         document.body.style.cursor = "pointer";
         const gsapState = { delta: radiusDelta.delta };
         gsap.to(gsapState, {
@@ -150,11 +151,10 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     });
 
     const onCardClicked = contextSafe(() => {
-        if (!meshRef.current || !camera || bIsPointerMoving || bHasBeenClicked)
+        if (!meshRef.current || !camera || bIsPointerMoving || !canBeClicked)
             return;
         //notify the parent that the card has been clicked
         props.onCardClicked(props.id);
-        setHasBeenClicked(true);
 
         const forward = new THREE.Vector3();
         meshRef.current.getWorldDirection(forward);

@@ -21,8 +21,6 @@ const SceneCanvas = (props: SceneCanvasProps) => {
   const { currentCardId, transitionTimers } = props
   const transitionObjectRef = useRef<HTMLDivElement>(null!)
 
-  const { contextSafe } = useGSAP();
-
   useGSAP(() => {
     if (!transitionObjectRef.current) return;
     setTimeout(() => {
@@ -69,6 +67,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
               key={project.id}
               id={project.id}
               onCardClicked={props.onCardClicked}
+              canBeClicked={currentCardId == null}
             />
           );
         })}
