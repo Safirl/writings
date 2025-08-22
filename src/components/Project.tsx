@@ -5,16 +5,18 @@ import styles from "../styles/project.module.scss"
 interface projectProps {
     id: number
     onBackButtonPressed: () => void
+    transitionTimer: number
 }
 
 const Project = (props: projectProps) => {
-    const { id, onBackButtonPressed } = props
+    const { id, onBackButtonPressed, transitionTimer } = props
     const [projectParagraphs, setProjectParagraphs] = useState<{ key: string, value: string }[]>()
 
     useEffect(() => {
-        setProjectParagraphs(projects.find((project) => project.id == id)?.paragraphs)
-        console.log("projectParagraphs", projectParagraphs)
-    }, [props.id])
+        setTimeout(() => {
+            setProjectParagraphs(projects.find((project) => project.id == id)?.paragraphs)
+        }, transitionTimer);
+    }, [id])
 
     if (!projectParagraphs) {
         return (<></>)

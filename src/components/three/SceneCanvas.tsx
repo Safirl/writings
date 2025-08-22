@@ -8,36 +8,46 @@ import { StatsGl } from "@react-three/drei";
 import projects from "../../data/projects";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import * as THREE from "three"
 
 interface SceneCanvasProps {
-  onDisplayCardContent: (id: number) => void;
+  onCardClicked: (id: number) => void;
+  currentCardId: number;
+  transitionTimers: { key: string, value: number }[]
 }
 
 const SceneCanvas = (props: SceneCanvasProps) => {
   const [radius, setRadius] = useState<number>(95);
-  const [isCardClicked, setIsCardClicked] = useState(false);
+  const { currentCardId, transitionTimers } = props
   const transitionObjectRef = useRef<HTMLDivElement>(null!)
-  const [currentCardId, setCurrentCardId] = useState<number>(null!)
 
   const { contextSafe } = useGSAP();
-
-  function onCardClicked(id: number) {
-    setCurrentCardId(id);
-    setIsCardClicked(true);
-  }
 
   useGSAP(() => {
     if (!transitionObjectRef.current) return;
     setTimeout(() => {
-
       gsap.to(transitionObjectRef.current.style, {
-        opacity: isCardClicked ? 1 : 0,
-        duration: 2,
+        opacity: currentCardId != null ? 1 : 0,
+        duration: getTransitionObjectDuration(),
         ease: "power2.inOut",
-        onComplete: () => { props.onDisplayCardContent(currentCardId) }
       });
-    }, 3000);
-  }, [isCardClicked])
+    }, getTransitionObjectDelay());
+  }, [currentCardId])
+
+  const getTransitionObjectDelay = () => {
+    if (currentCardId != null) {
+      return transitionTimers.find((timer) => timer.key === "transitionObjectDelayIn")?.value
+    }
+    return transitionTimers.find((timer) => timer.key === "transitionObjectDelayOut")?.value
+  }
+
+  const getTransitionObjectDuration = () => {
+    if (currentCardId != null) {
+      return transitionTimers.find((timer) => timer.key === "transitionObjectDurationIn")?.value! / 1000
+    }
+    return transitionTimers.find((timer) => timer.key === "transitionObjectDurationOut")?.value! / 1000
+  }
+
 
   return (
     <Suspense fallback={<Loading />}>
@@ -45,7 +55,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
         {/* Debug */}
         {/* <StatsGl /> */}
         {/* End of debug */}
-        <Environment isCardClicked={isCardClicked} />
+        <Environment isCardClicked={currentCardId != null} transitionTimers={transitionTimers} />
         {projects.map((project) => {
           return (
             <InteractiveCard
@@ -58,7 +68,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
               }}
               key={project.id}
               id={project.id}
-              onCardClicked={onCardClicked}
+              onCardClicked={props.onCardClicked}
             />
           );
         })}
@@ -71,7 +81,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
           position: "absolute",
           height: "100%",
           width: "100%",
-          backgroundColor: "black",
+          backgroundColor: "#0f0f0f",
           pointerEvents: "none",
           opacity: "0",
         }}

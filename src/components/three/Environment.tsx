@@ -21,6 +21,7 @@ import FloatingRocksParticles from "./FloatingRocksParticles";
 import DustParticles from "./DustParticles";
 interface EnvironmentProps {
   isCardClicked: boolean;
+  transitionTimers: { key: string, value: number }[]
 }
 const PARTICLES = [
   {
@@ -60,6 +61,7 @@ const Environment = (props: EnvironmentProps) => {
   const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
   const sunRef = useRef<THREE.Mesh>(null!);
   const particlesColorMap = useLoader(THREE.TextureLoader, 'textures/dust.png')
+  const { transitionTimers, isCardClicked } = props
 
   const [cameraSettings, setCameraSettings] = useState({
     zoomMin: 153,
@@ -84,25 +86,41 @@ const Environment = (props: EnvironmentProps) => {
   useEffect(() => {
     setCameraSettings((prev) => ({
       ...prev,
-      enableZoom: !props.isCardClicked,
-      enableRotate: !props.isCardClicked,
-      zoomMin: props.isCardClicked ? 0 : 153,
+      enableZoom: !isCardClicked,
+      enableRotate: !isCardClicked,
+      zoomMin: isCardClicked ? 0 : 153,
     }));
-  }, [props.isCardClicked]);
+  }, [isCardClicked]);
 
+  //vignette transition
   useGSAP(() => {
     const gsapState = { darkness: cameraSettings.vignetteDarkness };
     setTimeout(() => {
       gsap.to(gsapState, {
-        darkness: props.isCardClicked ? 5 : 0.5,
-        duration: 8,
+        darkness: isCardClicked ? 1 : 0.5,
+        duration: getVignetteDuration(),
         ease: "power2.in",
         onUpdate() {
           setCameraSettings((prev) => ({ ...prev, vignetteDarkness: gsapState.darkness }));
         },
       });
-    }, 400);
-  }, [props.isCardClicked]);
+    }, getVignetteDelay());
+  }, [isCardClicked]);
+
+  const getVignetteDelay = () => {
+    if (isCardClicked == false) {
+      return transitionTimers.find((timer) => timer.key === "vignetteDelayIn")?.value
+    }
+    return transitionTimers.find((timer) => timer.key === "vignetteDelayOut")?.value
+  }
+
+  const getVignetteDuration = () => {
+    if (isCardClicked == false) {
+      console.log(transitionTimers.find((timer) => timer.key === "vignetteDurationIn")?.value! / 1000)
+      return transitionTimers.find((timer) => timer.key === "vignetteDurationIn")?.value! / 1000
+    }
+    return transitionTimers.find((timer) => timer.key === "vignetteDurationOut")?.value! / 1000
+  }
 
   useFrame((state) => {
     if (!liquidMaterialRef.current) return;
@@ -216,7 +234,7 @@ const Environment = (props: EnvironmentProps) => {
           skySettings.sunPosition.z,
         ]}
       /> */}
-      <Icosahedron args={[600, 1]} material={new THREE.MeshStandardMaterial({ color: "black" })}>
+      <Icosahedron args={[600, 1]} material={new THREE.MeshStandardMaterial({ color: "#0f0f0f" })}>
         {/* <liquidMaterial
           ref={liquidMaterialRef}
           attach={"material"}
