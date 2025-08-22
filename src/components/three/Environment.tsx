@@ -116,7 +116,6 @@ const Environment = (props: EnvironmentProps) => {
 
   const getVignetteDuration = () => {
     if (isCardClicked == false) {
-      console.log(transitionTimers.find((timer) => timer.key === "vignetteDurationIn")?.value! / 1000)
       return transitionTimers.find((timer) => timer.key === "vignetteDurationIn")?.value! / 1000
     }
     return transitionTimers.find((timer) => timer.key === "vignetteDurationOut")?.value! / 1000

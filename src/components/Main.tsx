@@ -67,7 +67,7 @@ const Main = () => {
   }
 
   const onBackButtonPressed = () => {
-    setCurrentCardId(null!)
+    setCurrentCardId(-1)
   }
 
   return (
@@ -77,7 +77,7 @@ const Main = () => {
       ) : (
         <SceneCanvas onCardClicked={onCardClicked} currentCardId={currentCardId} transitionTimers={transitionTimers} />
       )}
-      {currentCardId != null && <Project id={currentCardId} onBackButtonPressed={onBackButtonPressed} transitionTimer={transitionTimers.find((timers) => timers.key === "projectIn")?.value!}></Project>}
+      {currentCardId != null && currentCardId != -1 && <Project id={currentCardId} onBackButtonPressed={onBackButtonPressed} transitionTimer={transitionTimers.find((timers) => timers.key === "projectIn")?.value!}></Project>}
     </>
   );
 };

@@ -9,6 +9,8 @@ import projects from "../../data/projects";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import * as THREE from "three"
+import CameraManager from "./CameraManager";
+import { type animationObject } from "./CameraManager";
 
 interface SceneCanvasProps {
   onCardClicked: (id: number) => void;
@@ -20,27 +22,48 @@ const SceneCanvas = (props: SceneCanvasProps) => {
   const [radius, setRadius] = useState<number>(95);
   const { currentCardId, transitionTimers } = props
   const transitionObjectRef = useRef<HTMLDivElement>(null!)
+  const [cameraAnimationObject, setCameraAnimationObject] = useState<animationObject>()
 
   useGSAP(() => {
-    if (!transitionObjectRef.current) return;
+    if (!transitionObjectRef.current || currentCardId == null) return;
     setTimeout(() => {
       gsap.to(transitionObjectRef.current.style, {
-        opacity: currentCardId != null ? 1 : 0,
+        opacity: currentCardId != -1 ? 1 : 0,
         duration: getTransitionObjectDuration(),
         ease: "power2.inOut",
       });
     }, getTransitionObjectDelay());
+
+    if (currentCardId == -1) {
+      console.log("coucou")
+      cardTransitionOut()
+    }
   }, [currentCardId])
 
+  const cardTransitionOut = () => {
+    setCameraAnimationObject({
+      targetPosition: new THREE.Vector3(5, 50, -500),
+      delay: 0,
+      duration: 0,
+      ease: ""
+    })
+    setCameraAnimationObject({
+      targetPosition: new THREE.Vector3(5, 50, -500),
+      delay: 0,
+      duration: 0,
+      ease: ""
+    })
+  }
+
   const getTransitionObjectDelay = () => {
-    if (currentCardId != null) {
+    if (currentCardId != -1) {
       return transitionTimers.find((timer) => timer.key === "transitionObjectDelayIn")?.value
     }
     return transitionTimers.find((timer) => timer.key === "transitionObjectDelayOut")?.value
   }
 
   const getTransitionObjectDuration = () => {
-    if (currentCardId != null) {
+    if (currentCardId != -1) {
       return transitionTimers.find((timer) => timer.key === "transitionObjectDurationIn")?.value! / 1000
     }
     return transitionTimers.find((timer) => timer.key === "transitionObjectDurationOut")?.value! / 1000
@@ -53,7 +76,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
         {/* Debug */}
         {/* <StatsGl /> */}
         {/* End of debug */}
-        <Environment isCardClicked={currentCardId != null} transitionTimers={transitionTimers} />
+        <Environment isCardClicked={currentCardId != null && currentCardId != -1} transitionTimers={transitionTimers} />
         {projects.map((project) => {
           return (
             <InteractiveCard
@@ -72,6 +95,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
           );
         })}
         <Planet onChangeRadius={setRadius} radius={radius} />
+        <CameraManager animationObject={cameraAnimationObject!} />
       </Canvas>
       <div
         ref={transitionObjectRef}
