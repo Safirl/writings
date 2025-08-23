@@ -7,6 +7,7 @@ import Project from "./Project";
 
 const Main = () => {
   const [bDisplayWelcome, setDisplayWelcome] = useState(true);
+  //null => initial state; -1=> no card selected
   const [currentCardId, setCurrentCardId] = useState<number>(null!)
 
   //in ms
@@ -28,7 +29,7 @@ const Main = () => {
     },
     {
       key: "transitionObjectDurationOut",
-      value: 2000
+      value: 0
     },
     {
       key: "transitionObjectDelayIn",
@@ -36,7 +37,7 @@ const Main = () => {
     },
     {
       key: "transitionObjectDelayOut",
-      value: 3000
+      value: 0
     },
 
     //Vignette
@@ -46,7 +47,7 @@ const Main = () => {
     },
     {
       key: "vignetteDurationOut",
-      value: 3000
+      value: 300
     },
     {
       key: "vignetteDelayIn",
@@ -54,7 +55,7 @@ const Main = () => {
     },
     {
       key: "vignetteDelayOut",
-      value: 1000
+      value: 0
     },
   ]
 

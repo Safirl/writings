@@ -18,7 +18,7 @@ interface cameraManagerProps {
 
 const CameraManager = (props: cameraManagerProps) => {
     const { camera } = useThree()
-    const obj = props.animationObject
+    let obj = props.animationObject
 
     useGSAP(() => {
         if (!obj || !obj.targetPosition || obj.duration == undefined || obj.ease == undefined) return;
@@ -28,7 +28,7 @@ const CameraManager = (props: cameraManagerProps) => {
                 x: obj.targetPosition.x,
                 y: obj.targetPosition.y,
                 z: obj.targetPosition.z,
-                duration: obj.duration,
+                duration: obj.duration / 1000,
                 ease: obj.ease,
                 onComplete: () => {
                     if (props.animationObject.onComplete)

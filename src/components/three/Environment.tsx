@@ -22,6 +22,7 @@ import DustParticles from "./DustParticles";
 interface EnvironmentProps {
   isCardClicked: boolean;
   transitionTimers: { key: string, value: number }[]
+  enableOrbitControls: boolean
 }
 const PARTICLES = [
   {
@@ -61,7 +62,7 @@ const Environment = (props: EnvironmentProps) => {
   const liquidMaterialRef = useRef<THREE.ShaderMaterial>(null!);
   const sunRef = useRef<THREE.Mesh>(null!);
   const particlesColorMap = useLoader(THREE.TextureLoader, 'textures/dust.png')
-  const { transitionTimers, isCardClicked } = props
+  const { transitionTimers, isCardClicked, enableOrbitControls } = props
 
   const [cameraSettings, setCameraSettings] = useState({
     zoomMin: 153,
@@ -108,14 +109,14 @@ const Environment = (props: EnvironmentProps) => {
   }, [isCardClicked]);
 
   const getVignetteDelay = () => {
-    if (isCardClicked == false) {
+    if (isCardClicked == true) {
       return transitionTimers.find((timer) => timer.key === "vignetteDelayIn")?.value
     }
     return transitionTimers.find((timer) => timer.key === "vignetteDelayOut")?.value
   }
 
   const getVignetteDuration = () => {
-    if (isCardClicked == false) {
+    if (isCardClicked == true) {
       return transitionTimers.find((timer) => timer.key === "vignetteDurationIn")?.value! / 1000
     }
     return transitionTimers.find((timer) => timer.key === "vignetteDurationOut")?.value! / 1000
@@ -210,7 +211,7 @@ const Environment = (props: EnvironmentProps) => {
       <directionalLight position={[5, 5, 5]} intensity={2.5} />
       {/* <pointLight position={[10, 50, 100]} intensity={200} /> */}
       <BackLight lightRef={sunRef} />
-      <OrbitControls
+      {enableOrbitControls && <OrbitControls
         enableRotate={cameraSettings.enableRotate}
         enablePan={false}
         enableZoom={cameraSettings.enableZoom}
@@ -220,7 +221,7 @@ const Environment = (props: EnvironmentProps) => {
         maxDistance={cameraSettings.zoomMax}
         rotateSpeed={cameraSettings.rotateSpeed}
         zoomSpeed={cameraSettings.zoomSpeed}
-      />
+      />}
       <Fog />
       <WaterPlane />
       {/* <Sky

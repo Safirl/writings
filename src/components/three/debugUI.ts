@@ -10,6 +10,7 @@ function getGUI() {
     gui.domElement.style.position = "absolute";
     gui.domElement.style.top = "0px";
     gui.domElement.style.left = "0px";
+    gui.domElement.style.display = "none";
   }
   return gui;
 }

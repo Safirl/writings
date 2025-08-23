@@ -23,6 +23,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
   const { currentCardId, transitionTimers } = props
   const transitionObjectRef = useRef<HTMLDivElement>(null!)
   const [cameraAnimationObject, setCameraAnimationObject] = useState<animationObject>()
+  const [enableOrbitControls, setEnableOrbitControls] = useState(true)
 
   useGSAP(() => {
     if (!transitionObjectRef.current || currentCardId == null) return;
@@ -35,7 +36,8 @@ const SceneCanvas = (props: SceneCanvasProps) => {
     }, getTransitionObjectDelay());
 
     if (currentCardId == -1) {
-      console.log("coucou")
+      console.log("current card id changed : ", currentCardId)
+      setEnableOrbitControls(false)
       cardTransitionOut()
     }
   }, [currentCardId])
@@ -45,13 +47,19 @@ const SceneCanvas = (props: SceneCanvasProps) => {
       targetPosition: new THREE.Vector3(5, 50, -500),
       delay: 0,
       duration: 0,
-      ease: ""
-    })
-    setCameraAnimationObject({
-      targetPosition: new THREE.Vector3(5, 50, -500),
-      delay: 0,
-      duration: 0,
-      ease: ""
+      ease: "power2.inOut",
+      onComplete: () => (
+        setCameraAnimationObject({
+          targetPosition: new THREE.Vector3(0, 10, 200),
+          delay: 0,
+          duration: 3000,
+          ease: "power2.inOut",
+          onComplete: () => {
+            setCameraAnimationObject(undefined)
+            setEnableOrbitControls(true)
+          }
+        })
+      )
     })
   }
 
@@ -76,7 +84,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
         {/* Debug */}
         {/* <StatsGl /> */}
         {/* End of debug */}
-        <Environment isCardClicked={currentCardId != null && currentCardId != -1} transitionTimers={transitionTimers} />
+        <Environment enableOrbitControls={enableOrbitControls} isCardClicked={currentCardId != null && currentCardId != -1} transitionTimers={transitionTimers} />
         {projects.map((project) => {
           return (
             <InteractiveCard
@@ -90,7 +98,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
               key={project.id}
               id={project.id}
               onCardClicked={props.onCardClicked}
-              canBeClicked={currentCardId == null}
+              canBeClicked={currentCardId == null || currentCardId == -1}
             />
           );
         })}
