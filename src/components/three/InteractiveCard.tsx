@@ -14,7 +14,7 @@ interface InteractiveCardProps {
     id: number;
     text: string;
     imgURL: string;
-    onCardClicked: (id: number) => void;
+    onCardClicked: (id: number, cardPosition: THREE.Vector3, cardRotation: THREE.Euler, forward: THREE.Vector3) => void;
     canBeClicked: boolean
 }
 
@@ -154,10 +154,10 @@ const InteractiveCard = (props: InteractiveCardProps) => {
         if (!meshRef.current || !camera || bIsPointerMoving || !canBeClicked)
             return;
         //notify the parent that the card has been clicked
-        props.onCardClicked(props.id);
-
         const forward = new THREE.Vector3();
         meshRef.current.getWorldDirection(forward);
+        props.onCardClicked(props.id, meshRef.current.position, meshRef.current.rotation, forward);
+
         let targetPosition = new THREE.Vector3();
         targetPosition = meshRef.current.position
             .clone()

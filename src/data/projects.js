@@ -22,6 +22,16 @@ const projects = [
     imgURL: "./projectImages/project1.jpg",
     phi: 2.83371657353799,
     theta: -2.72552,
+    paragraphs: [
+      {
+        key: "h1",
+        value: "I prefer chcolate",
+      },
+      {
+        key: "p",
+        value: "I prefer chcolate",
+      },
+    ],
   },
   {
     id: 2,
@@ -29,6 +39,16 @@ const projects = [
     imgURL: "./projectImages/project1.jpg",
     phi: 2.833,
     theta: 0.59032,
+    paragraphs: [
+      {
+        key: "h1",
+        value: "Hello",
+      },
+      {
+        key: "p",
+        value: "world!",
+      },
+    ],
   },
 ];
 

@@ -6,6 +6,7 @@ import gsap from "gsap"
 
 export interface animationObject {
     targetPosition: THREE.Vector3
+    targetRotation?: THREE.Euler
     delay: number
     duration: number
     ease: string
@@ -35,6 +36,15 @@ const CameraManager = (props: cameraManagerProps) => {
                         props.animationObject.onComplete()
                 },
             });
+            if (obj.targetRotation) {
+                gsap.to(camera.rotation, {
+                    x: obj.targetRotation.x,
+                    y: obj.targetRotation.y,
+                    z: obj.targetRotation.z,
+                    duration: obj.duration / 1000,
+                    ease: obj.ease,
+                });
+            }
         }, obj.delay);
     }, [props])
 

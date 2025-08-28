@@ -17,19 +17,19 @@ const Main = () => {
       key: "projectIn",
       value: 5000
     },
-
-    //TransitionObject
     {
       key: "projectOut",
       value: 5000
     },
+
+    //TransitionObject
     {
       key: "transitionObjectDurationIn",
       value: 2000
     },
     {
       key: "transitionObjectDurationOut",
-      value: 0
+      value: 500
     },
     {
       key: "transitionObjectDelayIn",

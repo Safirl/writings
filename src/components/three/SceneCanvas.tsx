@@ -24,6 +24,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
   const transitionObjectRef = useRef<HTMLDivElement>(null!)
   const [cameraAnimationObject, setCameraAnimationObject] = useState<animationObject>()
   const [enableOrbitControls, setEnableOrbitControls] = useState(true)
+  const [currentCardTransform, setCurrentCardTransform] = useState<{ position: THREE.Vector3, rotation: THREE.Euler, forward: THREE.Vector3 }>(null!)
 
   useGSAP(() => {
     if (!transitionObjectRef.current || currentCardId == null) return;
@@ -40,26 +41,35 @@ const SceneCanvas = (props: SceneCanvasProps) => {
       setEnableOrbitControls(false)
       cardTransitionOut()
     }
+    else {
+
+    }
   }, [currentCardId])
 
   const cardTransitionOut = () => {
     setCameraAnimationObject({
       targetPosition: new THREE.Vector3(5, 50, -500),
+      targetRotation: new THREE.Euler(0, 0, 0),
       delay: 0,
       duration: 0,
       ease: "power2.inOut",
-      onComplete: () => (
+      onComplete: () => {
+        let targetPosition = new THREE.Vector3();
+        targetPosition = currentCardTransform.position
+          .clone()
+          .add(currentCardTransform.forward.multiplyScalar(1.5));
         setCameraAnimationObject({
-          targetPosition: new THREE.Vector3(0, 10, 200),
+          targetPosition: targetPosition,
+          targetRotation: new THREE.Euler(currentCardTransform?.rotation.x, currentCardTransform?.rotation.y, currentCardTransform.rotation.z),
           delay: 0,
-          duration: 3000,
+          duration: 5000,
           ease: "power2.inOut",
           onComplete: () => {
             setCameraAnimationObject(undefined)
             setEnableOrbitControls(true)
           }
         })
-      )
+      }
     })
   }
 
@@ -75,6 +85,19 @@ const SceneCanvas = (props: SceneCanvasProps) => {
       return transitionTimers.find((timer) => timer.key === "transitionObjectDurationIn")?.value! / 1000
     }
     return transitionTimers.find((timer) => timer.key === "transitionObjectDurationOut")?.value! / 1000
+  }
+
+  const getTransitionProjectDuration = () => {
+    if (currentCardId != -1) {
+      return transitionTimers.find((timer) => timer.key === "transitionObjectDurationIn")?.value! / 1000
+    }
+    return transitionTimers.find((timer) => timer.key === "transitionObjectDurationOut")?.value! / 1000
+  }
+
+  const onCardClicked = (id: number, cardPosition: THREE.Vector3, cardRotation: THREE.Euler, forward: THREE.Vector3) => {
+    console.log(cardRotation)
+    setCurrentCardTransform({ position: cardPosition, rotation: cardRotation, forward })
+    props.onCardClicked(id)
   }
 
 
@@ -97,7 +120,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
               }}
               key={project.id}
               id={project.id}
-              onCardClicked={props.onCardClicked}
+              onCardClicked={onCardClicked}
               canBeClicked={currentCardId == null || currentCardId == -1}
             />
           );
