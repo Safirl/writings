@@ -12,6 +12,12 @@ const Main = () => {
 
   //in ms
   const transitionTimers = [
+    //intro
+    {
+      key: "transitionObjectIntroIn",
+      value: 1500
+    },
+
     //project
     {
       key: "projectIn",
@@ -19,7 +25,7 @@ const Main = () => {
     },
     {
       key: "projectOut",
-      value: 5000
+      value: 3000
     },
 
     //TransitionObject
@@ -29,7 +35,7 @@ const Main = () => {
     },
     {
       key: "transitionObjectDurationOut",
-      value: 500
+      value: 1000
     },
     {
       key: "transitionObjectDelayIn",
@@ -47,7 +53,7 @@ const Main = () => {
     },
     {
       key: "vignetteDurationOut",
-      value: 300
+      value: 1000
     },
     {
       key: "vignetteDelayIn",

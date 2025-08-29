@@ -16,6 +16,7 @@ interface InteractiveCardProps {
     imgURL: string;
     onCardClicked: (id: number, cardPosition: THREE.Vector3, cardRotation: THREE.Euler, forward: THREE.Vector3) => void;
     canBeClicked: boolean
+    enableCard: boolean
 }
 
 interface TextureLoadingState {
@@ -101,6 +102,7 @@ const InteractiveCard = (props: InteractiveCardProps) => {
     let [bIsPointerMoving, setIsPointerMoving] = useState(false);
     const { canBeClicked } = props
     const { camera } = useThree();
+    const { enableCard } = props
 
     const [angle, setAngle] = useState<{ theta: number; phi: number }>({
         theta: 0,
@@ -206,18 +208,20 @@ const InteractiveCard = (props: InteractiveCardProps) => {
 
     //Dissolve animation
     useGSAP(() => {
-        if (!textureState.texture || !textureState.noiseTexture) return;
+        if (!textureState.texture || !textureState.noiseTexture || !enableCard) return;
 
         const gsapState = { step: 0 };
-        gsap.to(gsapState, {
-            step: 1,
-            duration: 2,
-            ease: "power2.out",
-            onUpdate() {
-                setDissolveStep({ step: gsapState.step });
-            },
-        });
-    }, [textureState.texture, textureState.noiseTexture]);
+        setTimeout(() => {
+            gsap.to(gsapState, {
+                step: 1,
+                duration: 4,
+                ease: "power2.inOut",
+                onUpdate() {
+                    setDissolveStep({ step: gsapState.step });
+                },
+            });
+        }, Math.random() * 3000)
+    }, [textureState.texture, textureState.noiseTexture, enableCard]);
 
     // Load textures
     useEffect(() => {

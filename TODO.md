@@ -11,3 +11,4 @@ Notes des choses restantes à faire :
 [X]- background
 [X]- Loading animation
 []- Sounds
+[X]- Transitions entre projet et scène

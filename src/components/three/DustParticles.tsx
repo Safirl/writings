@@ -10,7 +10,7 @@ const DustParticles = (props: particlesProps) => {
     const { count, colorMap } = props
     const points = useRef<THREE.Points>(null!);
     const materialRef = useRef<THREE.PointsMaterial>(null!);
-    const [particleSize, setParticleSize] = useState({ size: 5 })
+    const [particleSize, setParticleSize] = useState({ size: 3 })
 
     const particlesPosition = useMemo(() => {
         const positions = new Float32Array(count * 3);

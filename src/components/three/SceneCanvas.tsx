@@ -25,6 +25,17 @@ const SceneCanvas = (props: SceneCanvasProps) => {
   const [cameraAnimationObject, setCameraAnimationObject] = useState<animationObject>()
   const [enableOrbitControls, setEnableOrbitControls] = useState(true)
   const [currentCardTransform, setCurrentCardTransform] = useState<{ position: THREE.Vector3, rotation: THREE.Euler, forward: THREE.Vector3 }>(null!)
+  const [isIntro, setIsIntro] = useState(true)
+
+  useGSAP(() => {
+    if (!isIntro) return;
+    gsap.to(transitionObjectRef.current.style, {
+      opacity: 0,
+      duration: (transitionTimers.find((timer) => timer.key === "transitionObjectIntroIn")?.value!) / 1000,
+      ease: "power2.inOut",
+      onComplete: () => { setIsIntro(false) }
+    });
+  }, [])
 
   useGSAP(() => {
     if (!transitionObjectRef.current || currentCardId == null) return;
@@ -37,38 +48,25 @@ const SceneCanvas = (props: SceneCanvasProps) => {
     }, getTransitionObjectDelay());
 
     if (currentCardId == -1) {
-      console.log("current card id changed : ", currentCardId)
       setEnableOrbitControls(false)
       cardTransitionOut()
-    }
-    else {
-
     }
   }, [currentCardId])
 
   const cardTransitionOut = () => {
+    let targetPosition = new THREE.Vector3();
+    targetPosition = currentCardTransform.position
+      .clone()
+      .add(currentCardTransform.forward.multiplyScalar(1.5));
     setCameraAnimationObject({
-      targetPosition: new THREE.Vector3(5, 50, -500),
-      targetRotation: new THREE.Euler(0, 0, 0),
+      targetPosition: targetPosition,
+      targetRotation: new THREE.Euler(currentCardTransform?.rotation.x, currentCardTransform?.rotation.y, currentCardTransform.rotation.z),
       delay: 0,
-      duration: 0,
+      duration: (transitionTimers.find((timer) => timer.key === "projectOut")?.value!),
       ease: "power2.inOut",
       onComplete: () => {
-        let targetPosition = new THREE.Vector3();
-        targetPosition = currentCardTransform.position
-          .clone()
-          .add(currentCardTransform.forward.multiplyScalar(1.5));
-        setCameraAnimationObject({
-          targetPosition: targetPosition,
-          targetRotation: new THREE.Euler(currentCardTransform?.rotation.x, currentCardTransform?.rotation.y, currentCardTransform.rotation.z),
-          delay: 0,
-          duration: 5000,
-          ease: "power2.inOut",
-          onComplete: () => {
-            setCameraAnimationObject(undefined)
-            setEnableOrbitControls(true)
-          }
-        })
+        setCameraAnimationObject(undefined)
+        setEnableOrbitControls(true)
       }
     })
   }
@@ -95,7 +93,6 @@ const SceneCanvas = (props: SceneCanvasProps) => {
   }
 
   const onCardClicked = (id: number, cardPosition: THREE.Vector3, cardRotation: THREE.Euler, forward: THREE.Vector3) => {
-    console.log(cardRotation)
     setCurrentCardTransform({ position: cardPosition, rotation: cardRotation, forward })
     props.onCardClicked(id)
   }
@@ -122,6 +119,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
               id={project.id}
               onCardClicked={onCardClicked}
               canBeClicked={currentCardId == null || currentCardId == -1}
+              enableCard={!isIntro}
             />
           );
         })}
@@ -137,7 +135,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
           width: "100%",
           backgroundColor: "#0f0f0f",
           pointerEvents: "none",
-          opacity: "0",
+          opacity: "1",
         }}
       ></div>
     </Suspense>
