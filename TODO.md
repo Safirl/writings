@@ -1,5 +1,5 @@
 Notes des choses restantes à faire :
-[]- Particules 
+[X]- Particules 
     - particules de fragments de pierres qui s'élèvent dans le ciel 
     - particules de poussières
 []- Placer correctement les images
