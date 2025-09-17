@@ -24,7 +24,8 @@ body {
 }
 
 main {
-  width: 600px;
+  max-width: 600px;
+  padding-top: variables.$spacing-xl;
 }
 
 canvas {
@@ -56,12 +57,14 @@ button {
   color: variables.$color-text;
   cursor: pointer;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 h1 {
   font-size: variables.$font-size-m;
+  font-family: variables.$font-normal;
 }
 
 //4k screens
-@media screen and (min-width: 2160) {
-}
+@media screen and (min-width: 2160) {}

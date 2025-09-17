@@ -27,7 +27,7 @@ const Project = (props: projectProps) => {
 
   return (
     <div className={styles.container}>
-      <button onClick={onBackButtonPressed}>retour</button>
+      <button className={styles.button} onClick={onBackButtonPressed}>retour</button>
       <main className={styles.main}>
         {projectParagraphs.map((paragraph, index) => {
           if (paragraph.key === "h1") {
