@@ -26,6 +26,7 @@ body {
 main {
   max-width: 600px;
   padding-top: variables.$spacing-xl;
+  margin: 0px variables.$spacing-m 0px variables.$spacing-m;
 }
 
 canvas {
@@ -67,4 +68,5 @@ h1 {
 }
 
 //4k screens
-@media screen and (min-width: 2160) {}
+@media screen and (min-width: 2160) {
+}

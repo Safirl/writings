@@ -46,6 +46,7 @@ const Project = (props: projectProps) => {
           );
         })}
       </main>
+      <div className={styles.spacer}></div>
     </div>
   );
 };

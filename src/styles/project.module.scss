@@ -2,12 +2,12 @@
 
 .container {
   position: absolute;
-  display: flex;
-  flex-direction: row;
-  align-items: baseline;
+  display: grid;
+  grid-template-columns: auto 60vw auto;
+  align-items: start;
   height: 100vh;
   width: 100vw;
-  justify-content: center;
+  gap: 0;
 }
 
 .main {
@@ -19,8 +19,10 @@
   overflow-y: scroll;
   scroll-behavior: smooth;
   scrollbar-width: none;
-  padding-bottom: 164px;
+  padding-bottom: 400px;
   box-sizing: border-box;
+  justify-self: center;
+  width: 100%;
 }
 
 .fadeIn {
@@ -38,7 +40,8 @@
   }
 }
 
-p {}
+p {
+}
 
 // p {
 //   display: flex;
@@ -49,7 +52,11 @@ p {}
 
 .button {
   padding-top: variables.$spacing-xl;
-  position: absolute;
-  top: 0;
-  left: 0;
+  padding-right: variables.$spacing-s;
+  justify-self: end;
+  align-self: start;
+}
+
+.spacer {
+  width: 100px; /* Largeur équivalente à la première colonne pour maintenir l'équilibre */
 }
