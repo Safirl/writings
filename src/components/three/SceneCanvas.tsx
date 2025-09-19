@@ -28,7 +28,7 @@ const SceneCanvas = (props: SceneCanvasProps) => {
   const [isIntro, setIsIntro] = useState(true)
 
   useGSAP(() => {
-    if (!isIntro) return;
+    if (!isIntro || !transitionObjectRef.current) return;
     gsap.to(transitionObjectRef.current.style, {
       opacity: 0,
       duration: (transitionTimers.find((timer) => timer.key === "transitionObjectIntroIn")?.value!) / 1000,

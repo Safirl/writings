@@ -6,10 +6,13 @@
   font-display: swap;
 }
 
+/* cormorant-garamond-regular - latin */
 @font-face {
-  font-family: "Junicode Bold";
-  src: url("/fonts/Junicode-Bold.woff") format("woff");
   font-display: swap;
+  font-family: 'Cormorant';
+  font-style: normal;
+  font-weight: 300;
+  src: url('/fonts/Cormorant.woff2') format('woff2');
 }
 
 body {
@@ -52,7 +55,7 @@ span {
 }
 
 button {
-  font-family: variables.$font-normal, Arial, Helvetica, sans-serif;
+  font-family: variables.$font-bold, Arial, Helvetica, sans-serif;
   font-size: variables.$font-size-s;
   background: none;
   color: variables.$color-text;
@@ -64,9 +67,8 @@ button {
 
 h1 {
   font-size: variables.$font-size-m;
-  font-family: variables.$font-normal;
+  font-family: variables.$font-bold;
 }
 
 //4k screens
-@media screen and (min-width: 2160) {
-}
+@media screen and (min-width: 2160) {}
