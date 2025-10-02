@@ -25,3 +25,21 @@ progress::-webkit-progress-value {
 progress::-moz-progress-bar {
   background-color: white;
 }
+
+.fadeInElement {
+  animation: fadeIn .5s ease-in-out forwards;
+}
+
+.fadeOutElement {
+  animation: fadeOut .5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeOut {
+  from {opacity: 1;}
+  to {opacity: 0;}
+}
