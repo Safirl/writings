@@ -1,6 +1,9 @@
 import projects from "../data/projects";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "../styles/project.module.scss";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import clsx from "clsx";
 
 interface projectProps {
   id: number;
@@ -9,6 +12,7 @@ interface projectProps {
 }
 
 const Project = (props: projectProps) => {
+  const refMainContainer = useRef<HTMLElement>(null!);
   const { id, onBackButtonPressed, transitionTimer } = props;
   const [projectParagraphs, setProjectParagraphs] =
     useState<{ key: string; value: string }[]>();
@@ -21,21 +25,45 @@ const Project = (props: projectProps) => {
     }, transitionTimer);
   }, [id]);
 
+  useGSAP(() => {
+    if (!refMainContainer.current) return;
+    const paragraphs = Array.from(
+      refMainContainer.current.children
+    ) as HTMLElement[];
+
+    let index = 0;
+    paragraphs.forEach((paragraph) => {
+      gsap.to(paragraph.style, {
+        opacity: 1,
+        duration: 1,
+        ease: "power2.inOut",
+        delay: index * 0.15,
+      });
+      index++;
+    });
+  }, [projectParagraphs]);
+
   if (!projectParagraphs) {
     return <></>;
   }
 
   return (
     <div className={styles.container}>
-      <button className={styles.button} onClick={onBackButtonPressed}>retour</button>
-      <main className={styles.main}>
+      <button className={styles.button} onClick={onBackButtonPressed}>
+        retour
+      </button>
+      <main className={styles.main} ref={refMainContainer}>
         {projectParagraphs.map((paragraph, index) => {
           if (paragraph.key === "h1") {
-            return <h1 key={index}>{paragraph.value}</h1>;
+            return (
+              <h1 key={index} style={{ opacity: 0 }}>
+                {paragraph.value}{" "}
+              </h1>
+            );
           }
 
           return (
-            <p key={index}>
+            <p key={index} style={{ opacity: 0 }}>
               {paragraph.value.split("\n").map((line, i) => (
                 <span key={i}>
                   {line}
